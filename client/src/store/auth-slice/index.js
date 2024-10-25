@@ -38,34 +38,38 @@ const authSlice = createSlice({
             state.isAuthenticated = true; // Set authenticated status to true
         },
         // You can define more reducers here (e.g., for logging out)
-        extraReducers: (builder) => {
-            builder
-            .addCase(registerUser, pending, (state) => {
-                state.isLoading = true
-            }).addCase(registerUser.fulfilled, (state, action) => {
-                state.isLoading = false;
-                state.user = null;
-                state.isAuthenticated = false
-            }).addCase(registerUser.rejected, (state, action) => {
-                state.isLoading = false;
-                state.user = null;
-                state.isAuthenticated = false
-            }).addCase(loginUser, pending, (state) => {
-                state.isLoading = true
-            }).addCase(loginUser.fulfilled, (state, action) => {
-                console.log(action)
-                state.isLoading = false;
-                state.user = action.payload.success?action.payload.user
-                :null;
-                state.isAuthenticated = !action.payload.success ? false :
-                true
-            }).addCase(loginUser.rejected, (state, action) => {
-                state.isLoading = false;
-                state.user = null;
-                state.isAuthenticated = false
-            })
-        } 
-    }
+    },
+    extraReducers: (builder) => {
+        builder
+          .addCase(registerUser.pending, (state) => {
+            state.isLoading = true;
+          })
+          .addCase(registerUser.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.user = null;
+            state.isAuthenticated = false;
+          })
+          .addCase(registerUser.rejected, (state, action) => {
+            state.isLoading = false;
+            state.user = null;
+            state.isAuthenticated = false;
+          })
+          .addCase(loginUser.pending, (state) => {
+            state.isLoading = true;
+          })
+          .addCase(loginUser.fulfilled, (state, action) => {
+            console.log(action);
+    
+            state.isLoading = false;
+            state.user = action.payload.success ? action.payload.user : null;
+            state.isAuthenticated = action.payload.success;
+          })
+          .addCase(loginUser.rejected, (state, action) => {
+            state.isLoading = false;
+            state.user = null;
+            state.isAuthenticated = false;
+          })
+    } 
 });
 
 // Exporting the action creator for setUser
