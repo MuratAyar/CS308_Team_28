@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const User = require('../../models/User')
 
 const { sendWelcomeEmail } = require("../../services/mailService");
-
+const { sendPasswordResetEmail } = require('../../services/passwordResetService');
 
 //register
 const registerUser = async(req, res) => {
@@ -23,10 +23,10 @@ const registerUser = async(req, res) => {
         ) 
 
         await newUser.save()
-        res.status(200).json({
+      /*  res.status(200).json({
             success : true,
             message : 'Registration Successful!'
-        })
+        }) */
 
         console.log("Email User:", process.env.EMAIL_USER);
         console.log("Email Pass:", process.env.EMAIL_PASS ? "Loaded" : "Not Loaded");
@@ -101,7 +101,46 @@ const loginUser = async(req, res) =>{
 
 //logout
 
+const resetPassword = async (req, res) => {
+    const { email } = req.body;
+  
+    try {
+      // Generate a random 8-character password
+      const newPassword = Math.random().toString(36).slice(-8);
+  
+      // Hash the new password
+      const hashedPassword = await bcrypt.hash(newPassword, 12);
+  
+      // Update the password in the database
+      const user = await User.findOneAndUpdate({ email }, { password: hashedPassword });
+  
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found"
+        });
+      }
+  
+      // Send the new password via email
+      await sendPasswordResetEmail(email, newPassword);
+  
+      res.status(200).json({
+        success: true,
+        message: "Password has been reset and sent to the user's email."
+      });
+  
+    } catch (error) {
+      console.error("Error resetting password:", error);
+      res.status(500).json({
+        success: false,
+        message: "An error occurred while resetting the password."
+      });
+    }
+  };
+  
+
 module.exports = { registerUser };
 
+
 //authmiddleware
-module.exports = {registerUser, loginUser};
+module.exports = { registerUser, loginUser, resetPassword };
