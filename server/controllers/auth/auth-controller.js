@@ -1,6 +1,10 @@
+require('dotenv').config();
+
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 const User = require('../../models/User')
+
+const { sendWelcomeEmail } = require("../../services/mailService");
 
 
 //register
@@ -23,6 +27,26 @@ const registerUser = async(req, res) => {
             success : true,
             message : 'Registration Successful!'
         })
+
+        console.log("Email User:", process.env.EMAIL_USER);
+        console.log("Email Pass:", process.env.EMAIL_PASS ? "Loaded" : "Not Loaded");
+
+        try {
+            await sendWelcomeEmail(email, userName);
+            // Email sent successfully
+            return res.status(201).json({
+              success: true,
+              message: "User registered and email sent!"
+            });
+          } catch (emailError) {
+            console.error("Error sending email:", emailError);
+            // If email fails, return a successful registration message without failing
+            return res.status(201).json({
+              success: true,
+              message: "User registered, but email failed to send."
+            });
+          }
+
     }catch(e){
         console.log(e);
         res.status(500).json({
@@ -77,6 +101,7 @@ const loginUser = async(req, res) =>{
 
 //logout
 
+module.exports = { registerUser };
 
 //authmiddleware
 module.exports = {registerUser, loginUser};

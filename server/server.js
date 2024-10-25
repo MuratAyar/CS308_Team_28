@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const authRouter = require("./routes/auth/auth-routes");
+const dotenv = require("dotenv");
+
+require('dotenv').config();
 
 //create a database connection
 //create a seperate file for this and import that file here
