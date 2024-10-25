@@ -1,5 +1,5 @@
 import CommonForm from "@/components/common/form";
-import { registerFormControls } from "@/config";
+import { registerFormControls } from "@/config"; 
 import { useToast } from "@/hooks/use-toast";
 import { registerUser } from "@/store/auth-slice";
 registerFormControls
@@ -36,6 +36,11 @@ function AuthRegister() {
           title: data?.payload?.message
       });
       navigate('/auth/login');
+      }else{
+        toast({
+          title: data?.payload?.message,
+          variant: "destructive",
+        });
       }
     });
   }
