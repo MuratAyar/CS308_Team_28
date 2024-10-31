@@ -1,0 +1,91 @@
+[33mcommit aea8676bb4b54abda311235ded5effaac0f4cb5e[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m
+Author: Yasin Mirioğlu <ysnmirioglu@gmail.com>
+Date:   Fri Nov 1 01:18:50 2024 +0300
+
+    Implemented product search functionality with validation and regex
+
+[33mcommit f51463bd6162d462f3faff2a769db72f490056fd[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Merge: 304ef72 b3e2a97
+Author: Ata Kocogullari <ata.kocogullari@sabanciuniv.edu>
+Date:   Thu Oct 31 19:41:31 2024 +0300
+
+    user account delete is done
+
+[33mcommit 304ef72b5acd91cd9816d8a289243c1cf10b125d[m
+Author: Ata Kocogullari <ata.kocogullari@sabanciuniv.edu>
+Date:   Thu Oct 31 19:32:41 2024 +0300
+
+    user account delete is done
+
+[33mcommit b3e2a971f91cf657adcc9f3f2a77b83fd8dbef27[m
+Author: Ata Kocogullari <ata.kocogullari@sabanciuniv.edu>
+Date:   Thu Oct 31 19:32:41 2024 +0300
+
+    Commit mesajı burada
+
+[33mcommit 58ac8cdbf3809daf6ece6bfddbc1253e4f221e1d[m
+Author: mert.saglam <mertsaglam349@gmail.com>
+Date:   Wed Oct 30 12:30:47 2024 +0300
+
+    Un-auth page and Not Found page
+
+[33mcommit 566dd34739b394e3fd93df95963b64f9198d4814[m
+Author: Ata Kocogullari <ata.kocogullari@sabanciuniv.edu>
+Date:   Sat Oct 26 00:54:37 2024 +0300
+
+    reset-password is added + crash bug on registration mails has been fixed
+
+[33mcommit cf1fbc9fbaedde44740adcd0d71f70752752a2aa[m
+Author: Ata Kocogullari <ata.kocogullari@sabanciuniv.edu>
+Date:   Sat Oct 26 00:49:19 2024 +0300
+
+    r
+
+[33mcommit a8a2fbe36fdff95c95d87033ab546574d17defd6[m
+Author: MuratAyar <ayar.murat55@gmail.com>
+Date:   Fri Oct 25 21:18:16 2024 +0300
+
+    register notifications and general mail notification implementations
+
+[33mcommit 0b2ecb21596125578cd3ec5e8717402eb3eab2bd[m
+Author: MuratAyar <ayar.murat55@gmail.com>
+Date:   Fri Oct 25 19:43:06 2024 +0300
+
+    admin and user login page navigation
+
+[33mcommit b0d8ecc2fa02214d8cd66d710791b9d7f73c250a[m
+Author: Ali Kumral <119426280+alikumral@users.noreply.github.com>
+Date:   Fri Oct 25 16:56:24 2024 +0300
+
+    user login & register actions completed
+
+[33mcommit a1b5d82e149ba5ec703c8727eb25ea523020d68c[m
+Author: Ali Kumral <119426280+alikumral@users.noreply.github.com>
+Date:   Fri Oct 25 15:06:21 2024 +0300
+
+    progress on user register functions
+
+[33mcommit e3568d2a5cb0366dc0f43ad4a8a6a61512b524c0[m
+Merge: 348907c 27ac94a
+Author: MuratAyar <ayar.murat55@gmail.com>
+Date:   Fri Oct 25 12:39:58 2024 +0300
+
+    Merge branch 'main' of https://github.com/MuratAyar/CS308_Team_28
+
+[33mcommit 348907ccc88e54119d7ede58479fffb472d78e97[m
+Author: MuratAyar <ayar.murat55@gmail.com>
+Date:   Fri Oct 25 12:39:24 2024 +0300
+
+    General setup of project
+
+[33mcommit 27ac94a4757cf2bc3f3febdebeaf7705ae1d5775[m
+Author: Ali Kumral <119426280+alikumral@users.noreply.github.com>
+Date:   Wed Oct 23 14:16:42 2024 +0300
+
+    Updated helloworld.txt
+
+[33mcommit 4ed8b1b41f13045c0696fa9de71534f6c7f27c5d[m
+Author: MuratAyar <ayar.murat55@gmail.com>
+Date:   Tue Oct 22 19:50:02 2024 +0300
+
+    first commit
