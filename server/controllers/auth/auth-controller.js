@@ -137,10 +137,63 @@ const resetPassword = async (req, res) => {
       });
     }
   };
+  const confirmDeletion = (req, res) => {
+    const { confirmation } = req.body;
+
+    // Step 1: Check for the "delete" confirmation keyword
+    if (confirmation !== "delete") {
+        return res.status(400).json({
+            success: false,
+            message: "Please type 'delete' to confirm account deletion"
+        });
+    }
+
+    // Keyword confirmed, prompt for password in the next step
+    res.status(200).json({
+        success: true,
+        message: "Confirmation keyword accepted. Please provide your password to continue."
+    });
+};
+const deleteUserAccount = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+      // Step 2: Find the user by email
+      const user = await User.findOne({ email });
+      if (!user) {
+          return res.status(404).json({
+              success: false,
+              message: "User not found"
+          });
+      }
+
+      // Step 3: Verify the password
+      const isPasswordCorrect = await bcrypt.compare(password, user.password);
+      if (!isPasswordCorrect) {
+          return res.status(401).json({
+              success: false,
+              message: "Incorrect password"
+          });
+      }
+
+      // Step 4: Delete the user account
+      await User.deleteOne({ email });
+
+      res.status(200).json({
+          success: true,
+          message: "User account deleted successfully"
+      });
+  } catch (error) {
+      console.error("Error deleting user account:", error);
+      res.status(500).json({
+          success: false,
+          message: "An error occurred while deleting the account"
+      });
+  }
+};
   
 
 module.exports = { registerUser };
 
-
 //authmiddleware
-module.exports = { registerUser, loginUser, resetPassword };
+module.exports = { registerUser, loginUser, resetPassword, confirmDeletion, deleteUserAccount };
