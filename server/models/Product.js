@@ -9,8 +9,10 @@ const productSchema = new mongoose.Schema({
     price: { type: Number, required: true },
     warrantyStatus: { type: Boolean },
     distributor: { type: String },
-    popularity: { type: Number, default: 0 }, // Optional, for sorting by popularity
-    category: { type: String } // Add if you have categories
-});
-
+    popularity: { type: Number, default: 0 },
+    rating: { type: Number },
+    category: { type: String },
+    gender: { type: String, enum: ['male', 'female', 'unisex'] },
+    brand: { type: String }
+  });
 module.exports = mongoose.model('Product', productSchema);
