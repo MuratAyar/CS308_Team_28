@@ -70,7 +70,7 @@ router.get('/all', async (req, res) => {
 
 
 
-module.exports = router;
+
 
 // Route to Get Products with Filtering and Pagination
 router.get('/filter', async (req, res) => {
@@ -116,3 +116,39 @@ router.get('/filter', async (req, res) => {
     }
   });
   
+
+
+router.put('/update-stock/:id', async (req, res) => {
+    const { id } = req.params;
+    const { newQuantity } = req.body;
+
+    // Validate the new quantity
+    if (newQuantity == null || newQuantity < 0) {
+        return res.status(400).json({ error: 'Invalid stock quantity' });
+    }
+
+    try {
+        // Find the product by ID and update the quantity
+        const product = await Product.findByIdAndUpdate(
+            id,
+            { quantityInStock: newQuantity },
+            { new: true, runValidators: true }
+        );
+
+        // If product is not found, return an error
+        if (!product) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+
+        // Respond with the updated product
+        res.json({ message: 'Stock quantity updated successfully', product });
+    } catch (error) {
+        console.error('Error updating stock quantity:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
+
+
+  module.exports = router;
