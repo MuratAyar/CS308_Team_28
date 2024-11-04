@@ -1,13 +1,16 @@
-require('dotenv').config(); // Add this line
-
+require('dotenv').config();
 const transporter = require("../config/mailConfig");
+const welcomeTemplate = require("../templates/welcomeTemplate");
 
 async function sendWelcomeEmail(to, username) {
+  // Use the welcomeTemplate to get the subject and HTML content
+  const { subject, html } = welcomeTemplate(username);
+
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: to,
-    subject: 'Welcome to Our Service!',
-    text: `Hello, ${username}! Thank you for registering with us. We are excited to have you on board!`
+    subject: subject, // Use the subject from the template
+    html: html,       // Use the HTML content from the template
   };
 
   try {

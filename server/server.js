@@ -5,6 +5,8 @@ const cors = require('cors');
 const authRouter = require("./routes/auth-routes");
 const dotenv = require("dotenv");
 const productRoutes = require('./routes/product-routes');
+const path = require('path');
+
 
 require('dotenv').config();
 
@@ -33,6 +35,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use('/api/auth', authRouter);
 app.use('/api/products', productRoutes); 
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 
 app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));
