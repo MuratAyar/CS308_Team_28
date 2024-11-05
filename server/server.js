@@ -6,6 +6,7 @@ const authRouter = require("./routes/auth-routes");
 const dotenv = require("dotenv");
 const productRoutes = require('./routes/product-routes');
 const path = require('path');
+const shopAddressRouter = require("./routes/shop/address-route")
 
 
 require('dotenv').config();
@@ -15,7 +16,7 @@ require('dotenv').config();
 mongoose
     .connect('mongodb+srv://mertsaglam349:Mert2003@mern.pmbfe.mongodb.net/')
     .then(() => console.log('Connected'))
-    .catch(() => console.log('error')
+    .catch(() => console.log('Cannot connect to the database!')
 )
 
 const app = express()
@@ -37,5 +38,6 @@ app.use('/api/auth', authRouter);
 app.use('/api/products', productRoutes); 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
+app.use("/api/shop/address", shopAddressRouter)
 
 app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));
