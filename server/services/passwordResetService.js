@@ -6,7 +6,7 @@ async function sendPasswordResetEmail(to, newPassword) {
     from: process.env.EMAIL_USER,
     to: to,
     subject: 'Password Reset Request',
-    text: `Hello, your password has been reset. Your new password is: ${newPassword}. Please log in and change your password as soon as possible.`,
+    text: `Hello, your password has been reset. Your new password is: ${newPassword}. We recommend you to save it. For any issues, please contact to twoeight.mail@gmail.com.`,
   };
 
   try {
