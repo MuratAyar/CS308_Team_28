@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
+const {authorizeRole, authenticateToken} = require('../middleware/index')
 router.get('/search', async (req, res) => {
     let { query } = req.query;
 
@@ -117,7 +118,7 @@ router.get('/filter', async (req, res) => {
   
 
 
-router.put('/update-stock/:id', async (req, res) => {
+router.put('/update-stock/:id',authenticateToken, authorizeRole('user'), async (req, res) => {
     const { id } = req.params;
     const { newQuantity } = req.body;
 
