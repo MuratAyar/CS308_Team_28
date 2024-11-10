@@ -43,3 +43,42 @@ export const loginFormControls = [
         
     },
 ]
+
+export const shoppingViewHeaderMenuItems = [
+    {
+      id: "home",
+      label: "Home",
+      path: "/shop/home",
+    },
+    {
+      id: "products",
+      label: "Products",
+      path: "/shop/listing",
+    },
+    {
+      id: "Hike & Camp",
+      label: "Hike & Camp",
+      path: "/shop/listing",
+    },
+    {
+      id: "Bikes & Cycling",
+      label: "Bikes & Cycling",
+      path: "/shop/listing",
+    },
+    {
+      id: "Women",
+      label: "Women",
+      path: "/shop/listing",
+    },
+    {
+      id: "Men",
+      label: "Men",
+      path: "/shop/listing",
+    },
+    {
+      id: "search",
+      label: "Search",
+      path: "/shop/search",
+    },
+  ];
+  
