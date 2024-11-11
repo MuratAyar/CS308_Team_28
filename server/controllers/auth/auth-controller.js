@@ -138,19 +138,22 @@ const resetPassword = async (req, res) => {
         message: "An error occurred while resetting the password."
       });
     }
-  };
-  const confirmDeletion = (req, res) => {
+};
+const confirmDeletion = (req, res) => {
+    console.log("Received request for confirm deletion:", req.body);  // Log incoming request data
+
     const { confirmation } = req.body;
 
     // Step 1: Check for the "delete" confirmation keyword
     if (confirmation !== "delete") {
+        console.log("Confirmation text is incorrect:", confirmation);
         return res.status(400).json({
             success: false,
             message: "Please type 'delete' to confirm account deletion"
         });
     }
 
-    // Keyword confirmed, prompt for password in the next step
+    console.log("Confirmation text is correct. Proceeding to next step.");
     res.status(200).json({
         success: true,
         message: "Confirmation keyword accepted. Please provide your password to continue."
