@@ -52,7 +52,7 @@ function HeaderRightContent() {
   return (
     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
       <Button variant="outline" size="icon">
-        <ShoppingCart className="w-6 h-6" />
+        <ShoppingCart className="w-6 h-6 " />
         <span className="sr-only">User cart</span>
       </Button>
 
@@ -98,8 +98,8 @@ function HeaderRightContent() {
 
 function ShoppingHeader() {
   return (
-    <header className="fixed top-0 z-40 w-full bg-background border-b shadow-md">
-      <div className="flex h-16 items-center justify-between px-4 md:px-6 max-w-screen-lg">
+    <header className="fixed top-0 z-40 w-full bg-background border-b">
+      <div className="flex h-16 items-center justify-between px-4 md:px-6 w-full">
         
         {/* Logo or Home Link */}
         <div className="flex-1">
@@ -125,20 +125,18 @@ function ShoppingHeader() {
           </SheetContent>
         </Sheet>
 
-        {/* Menu items and right content for larger screens */}
-        <div className="hidden lg:flex items-center justify-center">
+        {/* Menu items for larger screens */}
+        <div className="hidden lg:flex items-center flex-grow">
           <MenuItems />
         </div>
 
         {/* Right Section: Shopping cart and avatar icons */}
-        <div className="absolute top-0 right-0 flex items-center gap-4 p-4">
+        <div className="hidden lg:flex items-center ml-auto">
           <HeaderRightContent />
         </div>
       </div>
     </header>
   );
 }
-
-
 
 export default ShoppingHeader;
