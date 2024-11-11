@@ -18,6 +18,9 @@ import CheckAuth from "./components/common/check-auth"
 import UnAuthPage from "./pages/unauth-page"
 import { useSelector } from "react-redux"
 
+import ConfirmationDeletion from "./pages/shopping-view/ConfirmDeletion";
+import DeleteAccount from "./pages/shopping-view/DeleteAccount";
+
 
 function App() {
   const {user, isAuthenticated} = useSelector((state)=> state.auth)
@@ -62,6 +65,8 @@ function App() {
         <Route path="listing" element={<ShoppingListing/>}/>
         <Route path="account" element={<ShoppingAccount/>}/>
         <Route path="checkout" element={<CheckOut/>}/>
+        <Route path="account/confirm-delete" element={<ConfirmationDeletion />} />
+        <Route path="account/delete-account" element={<DeleteAccount />} />
 
 
         </Route>
