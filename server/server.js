@@ -8,6 +8,7 @@ const productRoutes = require('./routes/product-routes');
 const path = require('path');
 const shopAddressRouter = require("./routes/shop/address-route")
 const shopProductsRouter = require("./routes/shop/products-routes");
+const shopCartRouter = require("./routes/shop/cart-routes");
 
 require('dotenv').config();
 
@@ -40,5 +41,6 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use("/api/shop/address", shopAddressRouter)
 app.use('/api/shop/products', shopProductsRouter);
+app.use('/api/shop/cart', shopCartRouter);
 
 app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));
