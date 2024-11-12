@@ -3,6 +3,45 @@ const router = express.Router();
 const Product = require('../../models/Product');
 const {authorizeRole, authenticateToken} = require('../../middleware/index')
 
+const getFilterOptions = async (req, res) => {
+  try {
+      // Get distinct values for each filter field
+      const categories = await Product.distinct('category');
+      const brands = await Product.distinct('brand');
+      const genders = await Product.distinct('gender');
+
+      // Calculate price range
+      const priceStats = await Product.aggregate([
+          {
+              $group: {
+                  _id: null,
+                  minPrice: { $min: "$price" },
+                  maxPrice: { $max: "$price" }
+              }
+          }
+      ]);
+      const priceRange = priceStats.length ? { min: priceStats[0].minPrice, max: priceStats[0].maxPrice } : { min: 0, max: 0 };
+
+      
+      const inStockOptions = [true, false]; // Boolean options for in-stock status
+
+      
+      const ratings = await Product.distinct('rating');
+
+      
+      res.json({
+          categories,
+          brands,
+          genders,
+          priceRange,
+          inStockOptions,
+          ratings
+      });
+  } catch (error) {
+      console.error('Error fetching filter options:', error);
+      res.status(500).json({ error: 'Could not fetch filter options' });
+  }
+};
 
 const searchProducts = async (req, res) => {
     let { query } = req.query;
@@ -219,4 +258,4 @@ const filterProducts = async (req, res) => {
     }
   }
 
-  module.exports = {searchProducts, deleteProduct, updateStock,getAllProducts, getIds, addProduct, filterProducts}
+  module.exports = { getFilterOptions, searchProducts, deleteProduct, updateStock,getAllProducts, getIds, addProduct, filterProducts}
