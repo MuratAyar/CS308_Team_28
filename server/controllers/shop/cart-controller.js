@@ -183,83 +183,61 @@ const updateCartItemQty = async (req,res)=>{
 
 const deleteCartItem = async (req, res) => {
     try {
-        const { userId, productId } = req.params;
-
-        if (!userId || !productId) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid data provided!",
-            });
-        }
-
-        // Convert productId to ObjectId for consistent comparison
-        const productIdObj = mongoose.Types.ObjectId(productId);
-
-        // Find the cart for the given userId
-        const cart = await Cart.findOne({ userId });
-
-        if (!cart) {
-            return res.status(404).json({
-                success: false,
-                message: "Cart not found!",
-            });
-        }
-
-        // Log items before deletion
-        console.log("Cart items before deletion:", cart.items);
-
-        // Filter out the item with the specified productId
-        const initialLength = cart.items.length;
-        cart.items = cart.items.filter(item => !item.productId.equals(productIdObj));
-
-        // Log items after deletion
-        console.log("Cart items after deletion:", cart.items);
-
-        // Check if an item was actually removed
-        if (cart.items.length === initialLength) {
-            return res.status(404).json({
-                success: false,
-                message: "Cart item not present!",
-            });
-        }
-
-        // Mark items as modified to ensure Mongoose detects changes
-        cart.markModified('items');
-
-        // Save the updated cart
-        await cart.save();
-
-        // Populate updated cart items for response
-        await cart.populate({
-            path: "items.productId",
-            select: "image title price salePrice",
+      const { userId, productId } = req.params;
+      if (!userId || !productId) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid data provided!",
         });
-
-        const populatedCartItems = cart.items.map(item => ({
-            productId: item.productId ? item.productId._id : null,
-            image: item.productId ? item.productId.image : null,
-            title: item.productId ? item.productId.title : "Product not found!",
-            price: item.productId ? item.productId.price : null,
-            salePrice: item.productId ? item.productId.salePrice : null,
-            quantity: item.quantity,
-        }));
-
-        res.status(200).json({
-            success: true,
-            data: {
-                ...cart._doc,
-                items: populatedCartItems,
-            },
+      }
+  
+      const cart = await Cart.findOne({ userId }).populate({
+        path: "items.productId",
+        select: "image title price salePrice",
+      });
+  
+      if (!cart) {
+        return res.status(404).json({
+          success: false,
+          message: "Cart not found!",
         });
-
+      }
+  
+      cart.items = cart.items.filter(
+        (item) => item.productId._id.toString() !== productId
+      );
+  
+      await cart.save();
+  
+      await cart.populate({
+        path: "items.productId",
+        select: "image title price salePrice",
+      });
+  
+      const populateCartItems = cart.items.map((item) => ({
+        productId: item.productId ? item.productId._id : null,
+        image: item.productId ? item.productId.image : null,
+        title: item.productId ? item.productId.title : "Product not found",
+        price: item.productId ? item.productId.price : null,
+        salePrice: item.productId ? item.productId.salePrice : null,
+        quantity: item.quantity,
+      }));
+  
+      res.status(200).json({
+        success: true,
+        data: {
+          ...cart._doc,
+          items: populateCartItems,
+        },
+      });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            success: false,
-            message: "An error occurred while deleting the cart item.",
-        });
+      console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Error",
+      });
     }
-};
+  };
 
 
 module.exports = {
