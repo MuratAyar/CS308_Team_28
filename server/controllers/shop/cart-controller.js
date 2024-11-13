@@ -1,38 +1,49 @@
 const Cart = require ("../../models/Cart");
 const Product = require("../../models/Product");
 
-const addToCart = async (req,res)=>{
-    try{
-        const {userId, productId, quantity} = req.body;
-       
-        if(!userId || !productId || quantity <= 0){
+const addToCart = async (req, res) => {
+    try {
+        const { userId, productId, quantity } = req.body;
+
+        if (!userId || !productId || quantity <= 0) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid data provided!",
             });
         }
 
+        // Find the product and check stock quantity
         const product = await Product.findById(productId);
 
-        if(!product){
+        if (!product) {
             return res.status(404).json({
                 success: false,
                 message: "Product not found!",
             });
         }
-        
-        let cart = await Cart.findOne({userId});
 
-        if(!cart){
-            cart = new Cart ({userId, items: []});
+        // Check if product is in stock
+        if (product.quantityInStock === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "This product is out of stock and cannot be added to the cart.",
+            });
         }
 
-        const findCurrentProductIndex = cart.items.findIndex(item=> item.productId.toString() === productId);
-
-        if(findCurrentProductIndex === -1){
-            cart.items.push({productId, quantity});
+        // Find or create the user's cart
+        let cart = await Cart.findOne({ userId });
+        if (!cart) {
+            cart = new Cart({ userId, items: [] });
         }
-        else{
+
+        // Check if product is already in the cart
+        const findCurrentProductIndex = cart.items.findIndex(
+            (item) => item.productId.toString() === productId
+        );
+
+        if (findCurrentProductIndex === -1) {
+            cart.items.push({ productId, quantity });
+        } else {
             cart.items[findCurrentProductIndex].quantity += quantity;
         }
 
@@ -41,12 +52,11 @@ const addToCart = async (req,res)=>{
         res.status(200).json({
             success: true,
             data: cart,
-        })
-
-    }catch(error){
+        });
+    } catch (error) {
         console.log(error);
         res.status(500).json({
-            success : false,
+            success: false,
             message: "Error",
         });
     }
@@ -82,6 +92,11 @@ const fetchCartItems = async (req,res)=>{
             cart.items = validItems;
             await cart.save();
         }
+        // Calculate total cost by summing up each item's (price or salePrice) * quantity
+        const totalCost = validItems.reduce((total, item) => {
+            const price = item.productId.salePrice || item.productId.price;
+            return total + price * item.quantity;
+        }, 0);
 
         const populateCartItems = validItems.map(item => ({
             productId: item.productId._id,
@@ -98,6 +113,7 @@ const fetchCartItems = async (req,res)=>{
             data:{
                 ...cart._doc,
                 items: populateCartItems,
+                totalCost
             },
         });
 
@@ -162,7 +178,7 @@ const updateCartItemQty = async (req,res)=>{
             quantity: item.quantity,
 
         }));
-
+    
         res.status(200).json({
             success: true,
             data:{
@@ -203,9 +219,24 @@ const deleteCartItem = async (req, res) => {
         });
       }
   
-      cart.items = cart.items.filter(
-        (item) => item.productId._id.toString() !== productId
-      );
+      const itemIndex = cart.items.findIndex(
+        (item) => item.productId._id.toString() === productId
+    );
+        
+      if (itemIndex === -1) {
+            return res.status(404).json({
+                success: false,
+                message: "Item not found in the cart!",
+            });
+        }
+
+        // Decrease the quantity of the item by 1
+        if (cart.items[itemIndex].quantity > 1) {
+            cart.items[itemIndex].quantity -= 1;
+        } else {
+            // If the quantity is 1, remove the item from the cart
+            cart.items.splice(itemIndex, 1);
+        }
   
       await cart.save();
   
