@@ -2,7 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 const {authorizeRole, authenticateToken} = require('../middleware/index')
-const {searchProducts, updateStock, getAllProducts, filterProducts, addProduct, getIds, deleteProduct} = require('../controllers/product/product-controller')
+const {getFilterOptions, searchProducts, updateStock, getAllProducts, filterProducts, addProduct, getIds, deleteProduct} = require('../controllers/product/product-controller')
+
+
+router.get('/filters', getFilterOptions);
 
 router.get('/search', searchProducts);
 // Route to Get All Products with Sorting and Pagination

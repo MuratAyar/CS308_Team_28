@@ -13,6 +13,7 @@ const productSchema = new mongoose.Schema({
     rating: { type: Number },
     category: { type: String },
     gender: { type: String, enum: ['male', 'female', 'unisex'] },
-    brand: { type: String }
+    brand: { type: String },
+    image: { type : String }
   });
 module.exports = mongoose.model('Product', productSchema);
