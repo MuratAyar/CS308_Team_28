@@ -107,47 +107,55 @@ const getAllProducts = async (req, res) => {
     }
 }
 const filterProducts = async (req, res) => {
-    const { category, brand, minPrice, maxPrice, inStock, rating, gender, page = 1, limit = 10 } = req.query;
-  
-    // Build filter object based on query parameters
-    let filter = {};
-  
-    if (category) filter.category = category;
-    if (brand) filter.brand = brand;
-    if (gender) filter.gender = gender;
-    if (minPrice || maxPrice) {
+  const { category, brand, minPrice, maxPrice, inStock, rating, gender, page = 1, limit = 10, sort, order = 'asc' } = req.query;
+
+  // Build filter object based on query parameters
+  let filter = {};
+
+  if (category) filter.category = category;
+  if (brand) filter.brand = brand;
+  if (gender) filter.gender = gender;
+  if (minPrice || maxPrice) {
       filter.price = {};
       if (minPrice) filter.price.$gte = Number(minPrice);
       if (maxPrice) filter.price.$lte = Number(maxPrice);
-    }
-    if (inStock !== undefined) filter.quantityInStock = { $gte: inStock === 'true' ? 1 : 0 };
-    if (rating) filter.rating = { $gte: Number(rating) };
-  
-    const pageNumber = parseInt(page) || 1;
-    const limitNumber = parseInt(limit) || 10;
-  
-    try {
+  }
+  if (inStock !== undefined) filter.quantityInStock = { $gte: inStock === 'true' ? 1 : 0 };
+  if (rating) filter.rating = { $gte: Number(rating) };
+
+  const pageNumber = parseInt(page) || 1;
+  const limitNumber = parseInt(limit) || 10;
+
+  // Add sort options
+  let sortOptions = {};
+  if (sort) {
+      sortOptions[sort] = order === 'desc' ? -1 : 1;
+  }
+
+  try {
       // Calculate total products for pagination
       const totalProducts = await Product.countDocuments(filter);
-  
+
       // Calculate the total pages
       const totalPages = Math.ceil(totalProducts / limitNumber);
-  
-      // Fetch filtered products with pagination
+
+      // Fetch filtered products with sorting and pagination
       const products = await Product.find(filter)
-        .limit(limitNumber)
-        .skip((pageNumber - 1) * limitNumber);
-  
+          .sort(sortOptions) // Apply the sort options here
+          .limit(limitNumber)
+          .skip((pageNumber - 1) * limitNumber);
+
       res.json({
-        totalProducts,
-        totalPages,
-        currentPage: pageNumber,
-        products
+          totalProducts,
+          totalPages,
+          currentPage: pageNumber,
+          products
       });
-    } catch (error) {
+  } catch (error) {
+      console.error('Error fetching products:', error);
       res.status(500).json({ message: 'Error fetching products', error });
-    }
   }
+};
 
 
  const updateStock =  async (req, res) => {
