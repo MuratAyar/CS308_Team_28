@@ -1,4 +1,4 @@
-import axios from "axios";
+/*import axios from "axios";
 
 import {createSlice,createAsyncThunk} from "@reduxjs/toolkit";
 
@@ -89,4 +89,4 @@ const shoppingCartSlice = createSlice({
         });
     },
 });
-export default shoppingCartSlice.reducer;
+export default shoppingCartSlice.reducer;*/
