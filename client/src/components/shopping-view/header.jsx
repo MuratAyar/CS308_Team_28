@@ -49,6 +49,21 @@ function HeaderRightContent() {
     dispatch(logoutUser());
   }
 
+
+  if (!user) {
+    // Fallback content when user is null or undefined
+    return (
+      <Button
+        onClick={() => navigate("/auth/login")}
+        variant="outline"
+        className="flex items-center gap-2"
+      >
+        <User className="w-6 h-6" />
+        Login
+      </Button>
+    );
+  }
+
   return (
     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
       <Button variant="outline" size="icon">
@@ -62,12 +77,14 @@ function HeaderRightContent() {
           <DropdownMenuTrigger asChild>
             <Avatar className="bg-black">
               <AvatarFallback className="bg-black text-white font-extrabold">
-                {user.userName[0].toUpperCase()}
+              {user.userName?.[0]?.toUpperCase() || "G"} {/* Safely access userName */}
               </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="right" className="w-56">
-            <DropdownMenuLabel>Logged in as {user.userName}</DropdownMenuLabel>
+            <DropdownMenuLabel>
+              Logged in as {user.userName || "Guest"} {/* Fallback for userName */}
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => navigate("/shop/account")}>
               <UserCog className="mr-2 h-4 w-4" />
