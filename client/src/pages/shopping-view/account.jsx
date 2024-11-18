@@ -2,11 +2,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import accImg from "../../assets/account.jpg";
 import Address from "@/components/shopping-view/address";
 import ShoppingOrders from "@/components/shopping-view/orders";
+import { useNavigate } from "react-router-dom"; // Added to enable navigation
+import { useSelector } from "react-redux"; // Added to access user info from Redux
 
 //IMPORTANT NOTES!!
 //<ShoppingOrders /> will be added to the line 23
 
 function ShoppingAccount() {
+  const user = useSelector((state) => state.auth.user); // Access user data from Redux
+  const navigate = useNavigate();
+
+  const handleDeleteAccount = () => {
+      // Navigate to the confirm-delete page with user info
+      navigate("/shop/account/confirm-delete", { state: { user } });
+  };
+
     return (
       <div className="flex flex-col items-center justify-center min-h-screen"> {/* Centers content vertically and horizontally */}
         <div className="relative h-[200px] w-[200px] overflow-hidden"> {/* Adjust width and height as needed */}
@@ -30,6 +40,15 @@ function ShoppingAccount() {
               </TabsContent>
             </Tabs>
           </div>
+                {/* Added delete account button */}
+                <div className="flex justify-center mt-6">
+                    <button
+                        onClick={handleDeleteAccount}
+                        className="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600"
+                    >
+                        Delete My Account
+                    </button>
+                </div>
         </div>
       </div>
     );
