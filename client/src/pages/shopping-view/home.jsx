@@ -1,15 +1,16 @@
 import React, { useEffect, useState, Fragment } from 'react';
 import { ArrowUpDownIcon } from 'lucide-react';
-import { sortOptions } from "@/config";
+import { useDispatch, useSelector } from 'react-redux';
+import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useToast } from "@/hooks/use-toast";
 
 function ShoppingHome() {
     const [products, setProducts] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
-    const limit = 8; // Number of products per page
+    const limit = 4; // Number of products per page
     const [filters, setFilters] = useState({
         category: '',
         brand: '',
@@ -28,6 +29,9 @@ function ShoppingHome() {
         ratings: []
     });
     const [sortOption, setSortOption] = useState({ field: '', order: '' });
+    const dispatch = useDispatch();
+    const { user } = useSelector((state) => state.auth);
+    const { toast } = useToast();
 
     useEffect(() => {
         fetchFilterOptions();
@@ -86,11 +90,32 @@ function ShoppingHome() {
         setCurrentPage(1); // Reset to the first page when filters change
     };
 
-    const handleSortChange = (value) => {
-        const [field, order] = value.split('-'); // Split the value into field and order
-        setSortOption({ field, order }); // Update the sort option state
+    const handleSortChange = (e) => {
+        const [field, order] = e.target.value.split('-');
+        setSortOption({ field, order });
         setCurrentPage(1); // Reset to the first page when sort option changes
-    };    
+    };
+
+    const handleAddToCart = (productId) => {
+        if (!user) {
+            console.log('User not logged in');
+            return;
+        }
+        dispatch(addToCart({ userId: user.id, productId: productId, quantity: 1 }))
+            .then((data) => {
+                if (data?.payload?.success) {
+                    toast({
+                        title: "Product added to cart successfully",
+                    });
+                    dispatch(fetchCartItems(user.id));
+                } else {
+                    console.error('Failed to add product to cart.');
+                }
+            })
+            .catch((error) => {
+                console.error('Error adding product to cart:', error);
+            });
+    };
 
     return (
         <div className="relative min-h-screen p-4 md:p-6 mt-10">
@@ -106,7 +131,6 @@ function ShoppingHome() {
                             <div className="w-full">
                                 <h3 className="text-base font-semibold">Category</h3>
                                 <select
-                                    aria-label="category"
                                     value={filters.category || ''}
                                     onChange={(e) => handleFilterChange('category', e.target.value)}
                                     className="w-40 p-1 border rounded text-sm"
@@ -120,13 +144,11 @@ function ShoppingHome() {
                                 </select>
                             </div>
                         </Fragment>
-
                         {/* Brand Filter */}
                         <Fragment>
                             <div className="w-full">
                                 <h3 className="text-base font-semibold">Brand</h3>
                                 <select
-                                    aria-label="brand"
                                     value={filters.brand || ''}
                                     onChange={(e) => handleFilterChange('brand', e.target.value)}
                                     className="w-40 p-1 border rounded text-sm"
@@ -146,7 +168,6 @@ function ShoppingHome() {
                             <div className="w-full">
                                 <h3 className="text-base font-semibold">Price Range</h3>
                                 <input
-                                    aria-label="minPrice"
                                     type="number"
                                     value={filters.minPrice || ''}
                                     onChange={(e) => handleFilterChange('minPrice', e.target.value)}
@@ -154,7 +175,6 @@ function ShoppingHome() {
                                     className="w-28 p-1 border rounded mb-1 text-sm"
                                 />
                                 <input
-                                    aria-label="maxPrice"
                                     type="number"
                                     value={filters.maxPrice || ''}
                                     onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
@@ -169,7 +189,6 @@ function ShoppingHome() {
                             <div className="w-full">
                                 <h3 className="text-base font-semibold">In Stock</h3>
                                 <input
-                                    aria-label="inStock"
                                     type="checkbox"
                                     checked={filters.inStock || false}
                                     onChange={(e) => handleFilterChange('inStock', e.target.checked)}
@@ -184,7 +203,6 @@ function ShoppingHome() {
                             <div className="w-full">
                                 <h3 className="text-base font-semibold">Rating</h3>
                                 <input
-                                    aria-label="rating"
                                     type="number"
                                     value={filters.rating || ''}
                                     onChange={(e) => handleFilterChange('rating', e.target.value)}
@@ -221,36 +239,18 @@ function ShoppingHome() {
                 <div className="bg-background w-full rounded-lg shadow-sm relative">
                     <div className="p-4 border-b flex items-center justify-between">
                         <h2 className="text-lg font-extrabold">All Products</h2>
-                        <div className="flex items-center gap-3">
-                            <span className="text-muted-foreground">Products</span>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" size="sm" className="flex items-center gap-1">
-                                        <ArrowUpDownIcon className="h-4 w-4" />
-                                        <span>Sort by</span>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-[200px]">
-                                    <DropdownMenuRadioGroup
-                                        value={`${sortOption.field}-${sortOption.order}`}
-                                        onValueChange={(value) => {
-                                            const [field, order] = value.split('-');
-                                            setSortOption({ field, order });
-                                            setCurrentPage(1);
-                                        }}
-                                    >
-                                        {sortOptions.map((sortItem) => (
-                                            <DropdownMenuRadioItem
-                                                key={sortItem.id}
-                                                value={sortItem.id} 
-                                                onValueChange={handleSortChange} 
-                                            >
-                                                {sortItem.label}
-                                            </DropdownMenuRadioItem>
-                                        ))}
-                                    </DropdownMenuRadioGroup>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                        <div className="flex items-center gap-1 border border-gray-300 rounded px-2 py-1 bg-white w-40 text-sm">
+                            <ArrowUpDownIcon className="h-4 w-4" />
+                            <select
+                                value={`${sortOption.field}-${sortOption.order}`}
+                                onChange={handleSortChange}
+                                className="outline-none text-sm bg-white font-semibold"
+                            >
+                                <option value="" className="font-semibold">Sort by</option>
+                                <option value="price-asc" className="font-semibold">Price: Low to High</option>
+                                <option value="price-desc" className="font-semibold">Price: High to Low</option>
+                                <option value="popularity-desc" className="font-semibold">Popularity</option>
+                            </select>
                         </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
@@ -259,7 +259,8 @@ function ShoppingHome() {
                         ) : (
                             products.map((product) => (
                                 <div key={product._id} className="border p-4 rounded-lg">
-                                    <img src={`/product-images/${product.image}`}
+                                    <img
+                                        src={`/product-images/${product.image}`}
                                         alt={product.name}
                                         className="w-full h-40 object-cover mb-2 rounded"
                                     />
@@ -268,6 +269,9 @@ function ShoppingHome() {
                                     <p className="mb-1"><strong>Price:</strong> ${product.price}</p>
                                     <p className="mb-1"><strong>Brand:</strong> {product.brand}</p>
                                     <p className="mb-1"><strong>Category:</strong> {product.category}</p>
+                                    <Button onClick={() => handleAddToCart(product._id)} className="mt-2 w-full">
+                                        Add to Cart
+                                    </Button>
                                 </div>
                             ))
                         )}

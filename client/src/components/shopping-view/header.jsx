@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { User, House, LogOut, Menu, ShoppingCart, UserCog } from "lucide-react";
 import {
   Link,
@@ -20,10 +21,10 @@ import {
 import { Label } from "../ui/label";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { logoutUser } from "@/store/auth-slice";
-
+import UserCartWrapper from "./cart-wrapper";
+import { fetchCartItems } from "@/store/shop/cart-slice";
 
 function MenuItems() {
-
   return (
     <nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
       {shoppingViewHeaderMenuItems.map((menuItem) => (
@@ -39,9 +40,10 @@ function MenuItems() {
   );
 }
 
-
 function HeaderRightContent() {
-  const { user } = useSelector((state) => state.auth); // Get user state
+  const { user } = useSelector((state) => state.auth);
+  const { cartItems } = useSelector((state) => state.shoppingCart);
+  const [openCartSheet, setOpenCartSheet] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -49,16 +51,42 @@ function HeaderRightContent() {
     dispatch(logoutUser());
   }
 
+  // Fetch cart items if user is available
+  useEffect(() => {
+    if (user) {
+      dispatch(fetchCartItems(user?.id));
+    }
+  }, [dispatch, user]);
+
   return (
     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
-      {/* Shopping Cart: Always displayed */}
-      <Button variant="outline" size="icon" onClick={() => navigate("/shop/cart")}>
+      {/* Shopping Cart Button: Always visible */}
+      <Button
+        onClick={() => setOpenCartSheet(true)}
+        variant="outline"
+        size="icon"
+      >
         <ShoppingCart className="w-6 h-6" />
-        <span className="sr-only">Shopping cart</span>
+        <span className="sr-only">User cart</span>
       </Button>
 
+      {/* Sheet containing the User Cart */}
+      <Sheet
+        open={openCartSheet}
+        onOpenChange={() => setOpenCartSheet(false)}
+      >
+        <UserCartWrapper
+          cartItems={
+            cartItems && cartItems.items && cartItems.items.length > 0
+              ? cartItems.items
+              : []
+          }
+        />
+      </Sheet>
+
+      {/* Conditional User Controls */}
       {user ? (
-        // User is logged in
+        // Displayed if user is logged in
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Avatar className="bg-black">
@@ -84,7 +112,7 @@ function HeaderRightContent() {
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
-        // User is not logged in
+        // Displayed if user is not logged in
         <Button
           onClick={() => navigate("/auth/login")}
           variant="outline"
@@ -97,7 +125,6 @@ function HeaderRightContent() {
     </div>
   );
 }
-
 
 function ShoppingHeader() {
   return (
