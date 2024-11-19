@@ -21,7 +21,11 @@ const OrderSchema = new mongoose.Schema({
         notes: String
 
     },
-    orderStatus : String,
+    orderStatus: {
+        type: String,
+        enum: ['processing', 'in-transit', 'delivered'], // Enum with allowed values
+        default: 'processing', // Default value
+    },
     paymentMethod : String,
     paymentStatus : String,
     totalAmount : Number,
