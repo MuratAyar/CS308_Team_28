@@ -6,6 +6,7 @@ const User = require('../../models/User')
 
 const { sendWelcomeEmail } = require("../../services/mailService");
 const { sendPasswordResetEmail } = require('../../services/passwordResetService');
+const { sendFeedbackEmail } = require('../../services/mailService');
 
 //register
 const registerUser = async(req, res) => {
@@ -199,9 +200,22 @@ const deleteUserAccount = async (req, res) => {
  }
 };
 
+//feedback survey after account delete
+const sendFeedback = async (req, res) => {
+    const { feedbackText } = req.body;
+  
+    try {
+      await sendFeedbackEmail(feedbackText); // Use the mail service
+      res.status(200).json({ success: true, message: 'Feedback email sent successfully.' });
+    } catch (error) {
+      console.error('Error sending feedback email:', error);
+      res.status(500).json({ success: false, message: 'Failed to send feedback email.' });
+    }
+};
+
   
 
 module.exports = { registerUser };
 
 //authmiddleware
-module.exports = { registerUser, loginUser, resetPassword, confirmDeletion, deleteUserAccount };
+module.exports = { registerUser, loginUser, resetPassword, confirmDeletion, deleteUserAccount, sendFeedback };
