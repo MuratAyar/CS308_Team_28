@@ -1,16 +1,37 @@
 import { Minus, Plus, Trash } from "lucide-react";
 import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteCartItem, updateCartItemQty } from "@/store/shop/cart-slice";
+import { deleteCartItem, updateCartItemQty, fetchCartItems } from "@/store/shop/cart-slice";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect, useState } from "react";
 
 function UserCartItemsContent({ cartItem }) {
-    const { user } = useSelector(state => state.auth);
+    const { user } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
     const { toast } = useToast();
 
-    function handleUpdateQuantity(getCartItem, typeOfAction) {
-        const updatedQuantity = typeOfAction === "plus" ? getCartItem?.quantity + 1 : getCartItem?.quantity - 1;
+    const [guestId, setGuestId] = useState(localStorage.getItem("guestId"));
+    const userId = user?.id || guestId;
+
+    useEffect(() => {
+        const fetchCart = async () => {
+            if (!userId) {
+                const response = await dispatch(fetchCartItems("unknown_user"));
+                if (response?.payload?.guestId) {
+                    setGuestId(response.payload.guestId);
+                    localStorage.setItem("guestId", response.payload.guestId);
+                }
+            } else {
+                dispatch(fetchCartItems(userId));
+            }
+        };
+
+        fetchCart();
+    }, [dispatch, userId]);
+
+    const handleUpdateQuantity = (getCartItem, typeOfAction) => {
+        const updatedQuantity =
+            typeOfAction === "plus" ? getCartItem?.quantity + 1 : getCartItem?.quantity - 1;
 
         if (updatedQuantity <= 0) {
             handleCartItemDelete(getCartItem);
@@ -19,30 +40,28 @@ function UserCartItemsContent({ cartItem }) {
 
         dispatch(
             updateCartItemQty({
-                userId: user?.id,
+                userId,
                 productId: getCartItem?.productId,
                 quantity: updatedQuantity,
             })
         ).then((data) => {
             if (data?.payload?.success) {
-                toast({
-                    title: "Cart item updated successfully",
-                });
+                toast({ title: "Cart item updated successfully" });
+                dispatch(fetchCartItems(userId));
             }
         });
-    }
+    };
 
-    function handleCartItemDelete(getCartItem) {
+    const handleCartItemDelete = (getCartItem) => {
         dispatch(
-            deleteCartItem({ userId: user?.id, productId: getCartItem?.productId })
+            deleteCartItem({ userId, productId: getCartItem?.productId })
         ).then((data) => {
             if (data?.payload?.success) {
-                toast({
-                    title: "Cart item deleted successfully",
-                });
+                toast({ title: "Cart item deleted successfully" });
+                dispatch(fetchCartItems(userId));
             }
         });
-    }
+    };
 
     return (
         <div className="flex items-center space-x-4 py-4 border-b">
@@ -79,8 +98,7 @@ function UserCartItemsContent({ cartItem }) {
                 <p className="font-semibold">
                     $
                     {(
-                        (cartItem?.salePrice > 0 ? cartItem?.salePrice : cartItem?.price) *
-                        cartItem?.quantity
+                        (cartItem?.salePrice || cartItem?.price) * cartItem?.quantity
                     ).toFixed(2)}
                 </p>
                 <Trash

@@ -1,6 +1,6 @@
-import React, { useEffect, useState, Fragment } from 'react';
-import { ArrowUpDownIcon } from 'lucide-react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState, Fragment } from "react";
+import { ArrowUpDownIcon } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -12,13 +12,13 @@ function ShoppingHome() {
     const [loading, setLoading] = useState(false);
     const limit = 4; // Number of products per page
     const [filters, setFilters] = useState({
-        category: '',
-        brand: '',
-        gender: '',
-        minPrice: '',
-        maxPrice: '',
+        category: "",
+        brand: "",
+        gender: "",
+        minPrice: "",
+        maxPrice: "",
         inStock: false,
-        rating: ''
+        rating: "",
     });
     const [filterOptions, setFilterOptions] = useState({
         categories: [],
@@ -26,28 +26,43 @@ function ShoppingHome() {
         genders: [],
         priceRange: { min: 0, max: 0 },
         inStockOptions: [],
-        ratings: []
+        ratings: [],
     });
-    const [sortOption, setSortOption] = useState({ field: '', order: '' });
+    const [sortOption, setSortOption] = useState({ field: "", order: "" });
     const dispatch = useDispatch();
     const { user } = useSelector((state) => state.auth);
     const { toast } = useToast();
-
+    const [guestId, setGuestId] = useState(localStorage.getItem("guestId"));
+  
     useEffect(() => {
         fetchFilterOptions();
         fetchProducts(currentPage);
     }, [currentPage, filters, sortOption]);
 
+    useEffect(() => {
+        const initializeCart = async () => {
+            if (!user?.id && !guestId) {
+                const response = await dispatch(fetchCartItems("unknown_user")); // Request backend to handle guest logic
+                if (response?.payload?.guestId) {
+                    setGuestId(response.payload.guestId);
+                    localStorage.setItem("guestId", response.payload.guestId);
+                }
+            }
+        };
+
+        initializeCart();
+    }, [dispatch, user?.id, guestId]);
+
     const fetchFilterOptions = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/products/filters');
+            const response = await fetch("http://localhost:5000/api/products/filters");
             if (!response.ok) {
-                throw new Error('Failed to fetch filter options');
+                throw new Error("Failed to fetch filter options");
             }
             const data = await response.json();
             setFilterOptions(data);
         } catch (error) {
-            console.error('Error fetching filter options:', error);
+            console.error("Error fetching filter options:", error);
         }
     };
 
@@ -59,19 +74,21 @@ function ShoppingHome() {
                 limit,
                 sort: sortOption.field,
                 order: sortOption.order,
-                ...filters
+                ...filters,
             }).toString();
 
-            const response = await fetch(`http://localhost:5000/api/products/filter?${queryParams}`);
+            const response = await fetch(
+                `http://localhost:5000/api/products/filter?${queryParams}`
+            );
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error("Network response was not ok");
             }
             const data = await response.json();
 
             setProducts(data.products);
             setTotalPages(data.totalPages);
         } catch (error) {
-            console.error('Error fetching products:', error);
+            console.error("Error fetching products:", error);
         }
         setLoading(false);
     };
@@ -85,20 +102,20 @@ function ShoppingHome() {
     const handleFilterChange = (key, value) => {
         setFilters((prevFilters) => ({
             ...prevFilters,
-            [key]: value
+            [key]: value,
         }));
         setCurrentPage(1); // Reset to the first page when filters change
     };
 
     const handleSortChange = (e) => {
-        const [field, order] = e.target.value.split('-');
+        const [field, order] = e.target.value.split("-");
         setSortOption({ field, order });
         setCurrentPage(1); // Reset to the first page when sort option changes
     };
 
     const handleAddToCart = (productId) => {
         if (!user) {
-            console.log('User not logged in');
+            console.log("User not logged in");
             return;
         }
         dispatch(addToCart({ userId: user.id, productId: productId, quantity: 1 }))
@@ -109,11 +126,11 @@ function ShoppingHome() {
                     });
                     dispatch(fetchCartItems(user.id));
                 } else {
-                    console.error('Failed to add product to cart.');
+                    console.error("Failed to add product to cart.");
                 }
             })
             .catch((error) => {
-                console.error('Error adding product to cart:', error);
+                console.error("Error adding product to cart:", error);
             });
     };
 
@@ -131,8 +148,8 @@ function ShoppingHome() {
                             <div className="w-full">
                                 <h3 className="text-base font-semibold">Category</h3>
                                 <select
-                                    value={filters.category || ''}
-                                    onChange={(e) => handleFilterChange('category', e.target.value)}
+                                    value={filters.category || ""}
+                                    onChange={(e) => handleFilterChange("category", e.target.value)}
                                     className="w-40 p-1 border rounded text-sm"
                                 >
                                     <option value="">All Categories</option>
@@ -144,13 +161,14 @@ function ShoppingHome() {
                                 </select>
                             </div>
                         </Fragment>
+
                         {/* Brand Filter */}
                         <Fragment>
                             <div className="w-full">
                                 <h3 className="text-base font-semibold">Brand</h3>
                                 <select
-                                    value={filters.brand || ''}
-                                    onChange={(e) => handleFilterChange('brand', e.target.value)}
+                                    value={filters.brand || ""}
+                                    onChange={(e) => handleFilterChange("brand", e.target.value)}
                                     className="w-40 p-1 border rounded text-sm"
                                 >
                                     <option value="">All Brands</option>
@@ -169,15 +187,15 @@ function ShoppingHome() {
                                 <h3 className="text-base font-semibold">Price Range</h3>
                                 <input
                                     type="number"
-                                    value={filters.minPrice || ''}
-                                    onChange={(e) => handleFilterChange('minPrice', e.target.value)}
+                                    value={filters.minPrice || ""}
+                                    onChange={(e) => handleFilterChange("minPrice", e.target.value)}
                                     placeholder="Min Price"
                                     className="w-28 p-1 border rounded mb-1 text-sm"
                                 />
                                 <input
                                     type="number"
-                                    value={filters.maxPrice || ''}
-                                    onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
+                                    value={filters.maxPrice || ""}
+                                    onChange={(e) => handleFilterChange("maxPrice", e.target.value)}
                                     placeholder="Max Price"
                                     className="w-28 p-1 border rounded text-sm"
                                 />
@@ -191,7 +209,7 @@ function ShoppingHome() {
                                 <input
                                     type="checkbox"
                                     checked={filters.inStock || false}
-                                    onChange={(e) => handleFilterChange('inStock', e.target.checked)}
+                                    onChange={(e) => handleFilterChange("inStock", e.target.checked)}
                                     className="mr-2"
                                 />
                                 <label>Show Only In Stock</label>
@@ -204,8 +222,8 @@ function ShoppingHome() {
                                 <h3 className="text-base font-semibold">Rating</h3>
                                 <input
                                     type="number"
-                                    value={filters.rating || ''}
-                                    onChange={(e) => handleFilterChange('rating', e.target.value)}
+                                    value={filters.rating || ""}
+                                    onChange={(e) => handleFilterChange("rating", e.target.value)}
                                     placeholder="Minimum Rating"
                                     className="w-28 p-1 border rounded text-sm"
                                     min="1"
@@ -219,8 +237,8 @@ function ShoppingHome() {
                             <div className="w-full">
                                 <h3 className="text-base font-semibold">Gender</h3>
                                 <select
-                                    value={filters.gender || ''}
-                                    onChange={(e) => handleFilterChange('gender', e.target.value)}
+                                    value={filters.gender || ""}
+                                    onChange={(e) => handleFilterChange("gender", e.target.value)}
                                     className="w-40 p-1 border rounded text-sm"
                                 >
                                     <option value="">All</option>
@@ -246,10 +264,10 @@ function ShoppingHome() {
                                 onChange={handleSortChange}
                                 className="outline-none text-sm bg-white font-semibold"
                             >
-                                <option value="" className="font-semibold">Sort by</option>
-                                <option value="price-asc" className="font-semibold">Price: Low to High</option>
-                                <option value="price-desc" className="font-semibold">Price: High to Low</option>
-                                <option value="popularity-desc" className="font-semibold">Popularity</option>
+                                <option value="">Sort by</option>
+                                <option value="price-asc">Price: Low to High</option>
+                                <option value="price-desc">Price: High to Low</option>
+                                <option value="popularity-desc">Popularity</option>
                             </select>
                         </div>
                     </div>
@@ -266,10 +284,19 @@ function ShoppingHome() {
                                     />
                                     <h3 className="font-bold text-lg mb-2">{product.name}</h3>
                                     <p className="mb-2">{product.description}</p>
-                                    <p className="mb-1"><strong>Price:</strong> ${product.price}</p>
-                                    <p className="mb-1"><strong>Brand:</strong> {product.brand}</p>
-                                    <p className="mb-1"><strong>Category:</strong> {product.category}</p>
-                                    <Button onClick={() => handleAddToCart(product._id)} className="mt-2 w-full">
+                                    <p className="mb-1">
+                                        <strong>Price:</strong> ${product.price}
+                                    </p>
+                                    <p className="mb-1">
+                                        <strong>Brand:</strong> {product.brand}
+                                    </p>
+                                    <p className="mb-1">
+                                        <strong>Category:</strong> {product.category}
+                                    </p>
+                                    <Button
+                                        onClick={() => handleAddToCart(product._id)}
+                                        className="mt-2 w-full"
+                                    >
                                         Add to Cart
                                     </Button>
                                 </div>
@@ -290,7 +317,10 @@ function ShoppingHome() {
                 </button>
 
                 {currentPage > 2 && (
-                    <button onClick={() => handlePageChange(1)} className="p-2 border rounded bg-white text-black hover:bg-gray-200">
+                    <button
+                        onClick={() => handlePageChange(1)}
+                        className="p-2 border rounded bg-white text-black hover:bg-gray-200"
+                    >
                         1
                     </button>
                 )}
@@ -320,7 +350,10 @@ function ShoppingHome() {
 
                 {currentPage < totalPages - 2 && <span className="p-2">...</span>}
                 {currentPage < totalPages - 1 && (
-                    <button onClick={() => handlePageChange(totalPages)} className="p-2 border rounded bg-white text-black hover:bg-gray-200">
+                    <button
+                        onClick={() => handlePageChange(totalPages)}
+                        className="p-2 border rounded bg-white text-black hover:bg-gray-200"
+                    >
                         {totalPages}
                     </button>
                 )}
