@@ -41,7 +41,7 @@ function MenuItems() {
 
 
 function HeaderRightContent() {
-  const { user } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth); // Get user state
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -49,35 +49,21 @@ function HeaderRightContent() {
     dispatch(logoutUser());
   }
 
-
-  if (!user) {
-    // Fallback content when user is null or undefined
-    return (
-      <Button
-        onClick={() => navigate("/auth/login")}
-        variant="outline"
-        className="flex items-center gap-2"
-      >
-        <User className="w-6 h-6" />
-        Login
-      </Button>
-    );
-  }
-
   return (
     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
-      <Button variant="outline" size="icon">
-        <ShoppingCart className="w-6 h-6 " />
-        <span className="sr-only">User cart</span>
+      {/* Shopping Cart: Always displayed */}
+      <Button variant="outline" size="icon" onClick={() => navigate("/shop/cart")}>
+        <ShoppingCart className="w-6 h-6" />
+        <span className="sr-only">Shopping cart</span>
       </Button>
 
       {user ? (
-        // Displayed if user is logged in
+        // User is logged in
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Avatar className="bg-black">
               <AvatarFallback className="bg-black text-white font-extrabold">
-              {user.userName?.[0]?.toUpperCase() || "G"} {/* Safely access userName */}
+                {user.userName?.[0]?.toUpperCase() || "G"} {/* Safely access userName */}
               </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
@@ -98,7 +84,7 @@ function HeaderRightContent() {
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
-        // Displayed if user is not logged in
+        // User is not logged in
         <Button
           onClick={() => navigate("/auth/login")}
           variant="outline"
