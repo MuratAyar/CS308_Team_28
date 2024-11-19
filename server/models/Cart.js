@@ -2,9 +2,9 @@ const mongoose = require ('mongoose');
 const CartSchema = new mongoose.Schema(
 {
    userId:{
-        type : mongoose.Schema.Types.ObjectId,
+        type : mongoose.Schema.Types.Mixed,
         ref : "User",
-        required : true,
+        required : false,
    },
    items:[
     {
@@ -20,6 +20,7 @@ const CartSchema = new mongoose.Schema(
         },
     },
    ],
+ 
 },
 {
     timestamps : true,
