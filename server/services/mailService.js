@@ -22,4 +22,24 @@ async function sendWelcomeEmail(to, username) {
   }
 }
 
-module.exports = { sendWelcomeEmail };
+async function sendFeedbackEmail(feedbackText) {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: 'twoeight.mail@gmail.com', // Replace with the email for feedback
+    subject: 'User Feedback',
+    html: `
+      <h1>Feedback Received</h1>
+      <p>${feedbackText}</p>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Feedback email sent successfully.');
+  } catch (error) {
+    console.error('Error sending feedback email:', error);
+    throw error;
+  }
+}
+
+module.exports = { sendWelcomeEmail, sendFeedbackEmail };

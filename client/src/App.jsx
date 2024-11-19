@@ -20,6 +20,7 @@ import { useSelector } from "react-redux"
 
 import ConfirmationDeletion from "./pages/shopping-view/ConfirmDeletion";
 import DeleteAccount from "./pages/shopping-view/DeleteAccount";
+import AccountDeleted from "./pages/shopping-view/AccountDeleted";
 
 
 function App() {
@@ -67,6 +68,7 @@ function App() {
         <Route path="checkout" element={<CheckOut/>}/>
         <Route path="account/confirm-delete" element={<ConfirmationDeletion />} />
         <Route path="account/delete-account" element={<DeleteAccount />} />
+        <Route path="account/account-deleted" element={<AccountDeleted />} />
 
 
         </Route>
