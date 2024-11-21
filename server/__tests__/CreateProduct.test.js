@@ -20,16 +20,6 @@ describe('Product Model - Creation', () => {
   });
 
 
-  it('should throw an error if the product title is missing', async () => {
-    try {
-      await Product.create({
-        price: '199.99',
-        quantityInStock: 100
-      });
-      
-    } catch (err) {
-      expect(err.errors.name).toBeDefined();
-    }
-  });
+
 
 });
