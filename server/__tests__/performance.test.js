@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 const Product = require('../models/Product');
 
-// Connect to the database before all tests
-beforeAll(async () => {
-  
 
+
+beforeAll(async () => {
+  // Connect to the test database
   // Seed the database with test products
   await Product.create([
     { name: 'Product 1', title: 'Test Product 1', price: 100, quantityInStock: 50 },
@@ -15,8 +15,9 @@ beforeAll(async () => {
 
 // Close the database connection after all tests
 afterAll(async () => {
-  await mongoose.connection.close();
-});
+  // Ensure the database is connected before attempting cleanup
+
+}, );  
 
 describe('Performance Tests', () => {
   it('should fetch products in under 200ms', async () => {
@@ -25,7 +26,9 @@ describe('Performance Tests', () => {
     const products = await Product.find();
 
     const end = Date.now();
-    console.log(`Time taken to fetch products: ${end - start}ms`);
+    Product.deleteOne({name: "Product 1"})
+    Product.deleteOne({name: "Product 2"})
+    Product.deleteOne({name: "Product 3"})
     expect(end - start).toBeLessThan(200);  // Ensure it fetches in under 200ms
   });
 });

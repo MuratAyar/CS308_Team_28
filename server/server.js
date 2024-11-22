@@ -15,11 +15,19 @@ require('dotenv').config();
 
 //create a database connection
 //create a seperate file for this and import that file here
+if (process.env.NODE_ENV !== 'test') {
+    mongoose
+      .connect('mongodb+srv://mertsaglam349:Mert2003@mern.pmbfe.mongodb.net/')
+      .then(() => console.log('Connected to DB'))
+      .catch((err) => console.error('Cannot connect to DB:', err));
+  }
+/*
 mongoose
     .connect('mongodb+srv://mertsaglam349:Mert2003@mern.pmbfe.mongodb.net/')
     .then(() => console.log('Connected'))
     .catch(() => console.log('Cannot connect to the database!')
 )
+    */
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -44,5 +52,5 @@ app.use("/api/shop/address", shopAddressRouter)
 app.use('/api/shop/products', shopProductsRouter);
 app.use('/api/shop/cart', shopCartRouter);
 app.use("/api/shop/order", shopOrderRouter);
-
+module.exports = app;
 app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));
