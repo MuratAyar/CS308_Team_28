@@ -1,4 +1,7 @@
 const Order = require("../../models/Order");
+const { sendInvoiceEmail } = require("../../services/mailService");
+const User = require('../../models/User'); // Adjust the path as necessary
+
 
 const createOrder = async (req, res) => {
     const { userId, cartItems, addressInfo, cardNumber, expiryDate, totalAmount } = req.body;
@@ -32,26 +35,42 @@ const createOrder = async (req, res) => {
             orderDate: new Date(),
             cardNumber, // Store card info
             expiryDate,
-            orderStatus: "Pending",
+            orderStatus: "processing",
             paymentMethod: "Card",
             paymentStatus: "Pending",
         });
 
         await newOrder.save();
 
+        // Fetch user's email from the database
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        // Send the response before sending the email
         res.status(201).json({
             success: true,
-            message: "Order created successfully!",
+            message: "Order created successfully! Invoice email will be sent shortly.",
             orderId: newOrder._id,
         });
+
+        // Attempt to send the invoice email after the response
+        try {
+            await sendInvoiceEmail(user.email, newOrder);
+            console.log("Invoice email sent successfully.");
+        } catch (emailError) {
+            console.error("Error sending invoice email:", emailError);
+        }
     } catch (error) {
         console.error("Error creating order:", error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Error creating order.",
         });
     }
 };
+
 const changeOrderStatus = async (req, res) => {
     const { orderId } = req.params; // Retrieve order ID from URL params
     const { orderStatus } = req.body; // Retrieve the new order status from the request body
