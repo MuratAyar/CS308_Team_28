@@ -114,17 +114,20 @@ function ShoppingHome() {
     };
 
     const handleAddToCart = (productId) => {
-        if (!user) {
-            console.log("User not logged in");
+        const currentUserId = user?.id || guestId;
+    
+        if (!currentUserId) {
+            console.error("Unable to identify user or guest.");
             return;
         }
-        dispatch(addToCart({ userId: user.id, productId: productId, quantity: 1 }))
+    
+        dispatch(addToCart({ userId: currentUserId, productId: productId, quantity: 1 }))
             .then((data) => {
                 if (data?.payload?.success) {
                     toast({
                         title: "Product added to cart successfully",
                     });
-                    dispatch(fetchCartItems(user.id));
+                    dispatch(fetchCartItems(currentUserId)); // Update cart items for the current user or guest
                 } else {
                     console.error("Failed to add product to cart.");
                 }
@@ -133,6 +136,7 @@ function ShoppingHome() {
                 console.error("Error adding product to cart:", error);
             });
     };
+    
 
     return (
         <div className="relative min-h-screen p-4 md:p-6 mt-10">
