@@ -52,5 +52,6 @@ app.use("/api/shop/address", shopAddressRouter)
 app.use('/api/shop/products', shopProductsRouter);
 app.use('/api/shop/cart', shopCartRouter);
 app.use("/api/shop/order", shopOrderRouter);
+app.use('/api/products', productRoutes);
 module.exports = app;
 app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));

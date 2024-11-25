@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
+const Comment = require('../models/Comment')
 const {authorizeRole, authenticateToken} = require('../middleware/index')
-const {getFilterOptions, searchProducts, updateStock, getAllProducts, filterProducts, addProduct, getIds, deleteProduct} = require('../controllers/product/product-controller')
+const {getFilterOptions, searchProducts, updateStock, getAllProducts, filterProducts, 
+  addProduct, getIds, deleteProduct, addRating, addComment} = require('../controllers/product/product-controller')
 
 
 router.get('/filters', getFilterOptions);
@@ -19,4 +21,7 @@ router.post('/add', addProduct);
 router.post('/get-ids', getIds);
 // Delete a product by _id (as query parameter)
 router.delete('/delete', deleteProduct);
+router.post('/:productId/comment', authenticateToken, addComment);
+router.post('/:productId/rating', authenticateToken, addRating);
+
   module.exports = router;

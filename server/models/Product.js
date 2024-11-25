@@ -10,10 +10,11 @@ const productSchema = new mongoose.Schema({
     warrantyStatus: { type: Boolean },
     distributor: { type: String },
     popularity: { type: Number, default: 0 },
-    rating: { type: Number },
+    rating: { type: Number },  // This is the field we're updating
     category: { type: String },
     gender: { type: String, enum: ['male', 'female', 'unisex'] },
     brand: { type: String },
-    image: { type : String }
-  });
+    image: { type: String },
+});
+
 module.exports = mongoose.model('Product', productSchema);

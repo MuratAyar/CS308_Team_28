@@ -1,7 +1,28 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../../models/Product');
+const Comment = require('../../models/Comment');
 const {authorizeRole, authenticateToken} = require('../../middleware/index')
+const mongoose = require('mongoose')
+
+const getFilteredProducts = async (req, res) => {
+  try {
+
+    const products = await Product.find({});
+
+    res.status(200).json({
+      success: true,
+      data: products,
+    });
+  } catch (e) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Some error occured",
+    });
+  }
+};
+
 
 const getFilterOptions = async (req, res) => {
   try {
@@ -265,5 +286,78 @@ const filterProducts = async (req, res) => {
       });
     }
   }
+  
+  const addComment = async (req, res) => {
+    const { productId } = req.params;
+    const { text } = req.body;
 
-  module.exports = { getFilterOptions, searchProducts, deleteProduct, updateStock,getAllProducts, getIds, addProduct, filterProducts}
+    if (!text) {
+        return res.status(400).json({ error: 'Comment text is required' });
+    }
+
+    try {
+        const product = await Product.findById(productId);
+
+        if (!product) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+
+        const newComment = await Comment.create({
+            user: req.user.id, // Authenticated user ID
+            productId, // Link to the product
+            content: text, // Comment text
+        });
+
+        return res.status(201).json({
+            message: 'Comment added successfully',
+            comment: newComment,
+        });
+    } catch (err) {
+        console.error('Error in addComment:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+const addRating = async (req, res) => {
+  const { productId } = req.params;
+  const { rating } = req.body;  // Only expecting rating
+
+  try {
+      console.log("Product ID:", productId);
+      console.log("Rating from request body:", rating);
+
+      // Validate the productId
+      if (!mongoose.Types.ObjectId.isValid(productId)) {
+          return res.status(400).json({ message: 'Invalid product ID' });
+      }
+
+      const product = await Product.findById(productId);
+
+      if (!product) {
+          return res.status(404).json({ message: 'Product not found' });
+      }
+
+      // Validate the rating (should be between 1 and 5)
+      if (rating < 1 || rating > 5) {
+          return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+      }
+
+      // Update the product's rating (assumes no comment logic)
+      product.rating = rating;  // Directly assign the rating
+
+      // Save the product with updated rating
+      await product.save();
+
+      res.status(200).json({
+          message: 'Rating added successfully',
+          product,
+      });
+  } catch (err) {
+      console.error("Error in addRating:", err);
+      res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+  module.exports = {getFilteredProducts, getFilterOptions, searchProducts, deleteProduct, updateStock, 
+    getAllProducts, getIds, addProduct, filterProducts, addComment, addRating,}
