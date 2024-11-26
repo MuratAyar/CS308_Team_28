@@ -231,11 +231,7 @@ const deleteCartItem = async (req, res) => {
             });
         }
 
-        if (cart.items[itemIndex].quantity > 1) {
-            cart.items[itemIndex].quantity -= 1;
-        } else {
-            cart.items.splice(itemIndex, 1);
-        }
+        cart.items.splice(itemIndex, 1);
 
         await cart.save();
 
