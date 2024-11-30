@@ -32,26 +32,14 @@ function ShoppingHome() {
     const dispatch = useDispatch();
     const { user } = useSelector((state) => state.auth);
     const { toast } = useToast();
-    const [guestId, setGuestId] = useState(localStorage.getItem("guestId"));
-  
+    const { cartItems } = useSelector((state) => state.shopCart);
+    
     useEffect(() => {
         fetchFilterOptions();
         fetchProducts(currentPage);
     }, [currentPage, filters, sortOption]);
 
-    useEffect(() => {
-        const initializeCart = async () => {
-            if (!user?.id && !guestId) {
-                const response = await dispatch(fetchCartItems("unknown_user")); // Request backend to handle guest logic
-                if (response?.payload?.guestId) {
-                    setGuestId(response.payload.guestId);
-                    localStorage.setItem("guestId", response.payload.guestId);
-                }
-            }
-        };
-
-        initializeCart();
-    }, [dispatch, user?.id, guestId]);
+   
 
     const fetchFilterOptions = async () => {
         try {
@@ -113,29 +101,62 @@ function ShoppingHome() {
         setCurrentPage(1); // Reset to the first page when sort option changes
     };
 
-    const handleAddToCart = (productId) => {
-        const currentUserId = user?.id || guestId;
+    const handleAddToCart = async (productId, totalStock) => {
+        try {
+            // Retrieve cart items to check if the product already exists
+            const currentCartItems = cartItems.items || [];
+            const existingItemIndex = currentCartItems.findIndex(
+                (item) => item.productId === productId
+            );
     
-        if (!currentUserId) {
-            console.error("Unable to identify user or guest.");
-            return;
-        }
-    
-        dispatch(addToCart({ userId: currentUserId, productId: productId, quantity: 1 }))
-            .then((data) => {
-                if (data?.payload?.success) {
+            // Stock validation
+            if (existingItemIndex > -1) {
+                const currentQuantity = currentCartItems[existingItemIndex].quantity;
+                if (currentQuantity + 1 > totalStock) {
                     toast({
-                        title: "Product added to cart successfully",
+                        title: `Only ${totalStock} quantity can be added for this item.`,
+                        variant: "destructive",
                     });
-                    dispatch(fetchCartItems(currentUserId)); // Update cart items for the current user or guest
-                } else {
-                    console.error("Failed to add product to cart.");
+                    return;
                 }
-            })
-            .catch((error) => {
-                console.error("Error adding product to cart:", error);
+            }
+    
+            // Determine userId (use Redux state or null for the first call)
+            let userId = user?.id || cartItems?.userId || null;
+    
+            // Add product to cart
+            const addToCartResponse = await dispatch(
+                addToCart({
+                    userId,
+                    productId,
+                    quantity: 1,
+                })
+            );
+    
+            // Capture the backend-generated `guestId` for future use
+            if (addToCartResponse?.payload?.guestId && !user?.id) {
+                userId = addToCartResponse.payload.guestId;
+    
+                // Optionally update Redux to save the guestId (if supported by your slice)
+                // dispatch(setGuestId(userId));
+            }
+    
+            // Refresh the cart
+            await dispatch(fetchCartItems(userId));
+    
+            toast({
+                title: "Product is added to the cart successfully!",
             });
+        } catch (error) {
+            console.error("Error adding product to cart:", error);
+            toast({
+                title: "Error",
+                description: "Something went wrong while adding the product to the cart.",
+                variant: "destructive",
+            });
+        }
     };
+    
     
 
     return (
