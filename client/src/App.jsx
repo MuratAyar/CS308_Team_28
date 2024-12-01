@@ -21,7 +21,7 @@ import { useSelector } from "react-redux"
 import ConfirmationDeletion from "./pages/shopping-view/ConfirmDeletion";
 import DeleteAccount from "./pages/shopping-view/DeleteAccount";
 import AccountDeleted from "./pages/shopping-view/AccountDeleted";
-
+import OrderSuccess from "./pages/shopping-view/OrderSuccess"; 
 
 function App() {
   const {user, isAuthenticated} = useSelector((state)=> state.auth)
@@ -69,11 +69,14 @@ function App() {
         <Route path="account/confirm-delete" element={<ConfirmationDeletion />} />
         <Route path="account/delete-account" element={<DeleteAccount />} />
         <Route path="account/account-deleted" element={<AccountDeleted />} />
+        <Route path="order-success/:orderId" element={<OrderSuccess />} />
 
 
         </Route>
         <Route path="unauth-page" element={<UnAuthPage/>}/>
         <Route path="*" element={<NotFound/>}/>
+
+        
 
       </Routes>
     </div>

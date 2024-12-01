@@ -33,6 +33,8 @@ function ShoppingHome() {
     const dispatch = useDispatch();
     const { user } = useSelector((state) => state.auth);
     const { toast } = useToast();
+    const { cartItems } = useSelector((state) => state.shopCart);
+    
     const [guestId, setGuestId] = useState(localStorage.getItem("guestId"));
 
     const [isProductDetailsOpen, setProductDetailsOpen] = useState(false);
@@ -56,7 +58,6 @@ function ShoppingHome() {
         fetchProducts(currentPage);
     }, [currentPage, filters, sortOption]);
 
-   
     const fetchFilterOptions = async () => {
         try {
             const response = await fetch("http://localhost:5000/api/products/filters");
@@ -116,37 +117,63 @@ function ShoppingHome() {
         setSortOption({ field, order });
         setCurrentPage(1); // Reset to the first page when sort option changes
     };
-    const handleAddToCart = async (productId) => {
+
+    const handleAddToCart = async (productId, totalStock) => {
         try {
-            const response = await dispatch(
+            // Retrieve cart items to check if the product already exists
+            const currentCartItems = cartItems.items || [];
+            const existingItemIndex = currentCartItems.findIndex(
+                (item) => item.productId === productId
+            );
+    
+            // Stock validation
+            if (existingItemIndex > -1) {
+                const currentQuantity = currentCartItems[existingItemIndex].quantity;
+                if (currentQuantity + 1 > totalStock) {
+                    toast({
+                        title: `Only ${totalStock} quantity can be added for this item.`,
+                        variant: "destructive",
+                    });
+                    return;
+                }
+            }
+    
+            // Determine userId (use Redux state or null for the first call)
+            let userId = user?.id || cartItems?.userId || null;
+    
+            // Add product to cart
+            const addToCartResponse = await dispatch(
                 addToCart({
-                    userId: user?.id || localStorage.getItem("guestId") || "unknown_user",
+                    userId,
                     productId,
                     quantity: 1,
                 })
             );
     
-            if (response?.payload?.guestId) {
-                
-                localStorage.setItem("guestId", response.payload.guestId);
+            // Capture the backend-generated `guestId` for future use
+            if (addToCartResponse?.payload?.guestId && !user?.id) {
+                userId = addToCartResponse.payload.guestId;
+    
+                // Optionally update Redux to save the guestId (if supported by your slice)
+                // dispatch(setGuestId(userId));
             }
     
-            if (response?.payload?.success) {
-                toast({
-                    title: "Product added to cart successfully",
-                });
-               
-                await dispatch(fetchCartItems(user?.id || localStorage.getItem("guestId")));
-            } else {
-                console.error("Failed to add product to cart:", response?.payload?.message);
-            }
+            // Refresh the cart
+            await dispatch(fetchCartItems(userId));
+    
+            toast({
+                title: "Product is added to the cart successfully!",
+            });
         } catch (error) {
             console.error("Error adding product to cart:", error);
+            toast({
+                title: "Error",
+                description: "Something went wrong while adding the product to the cart.",
+                variant: "destructive",
+            });
         }
     };
     
-    
-
     return (
         <div className="relative min-h-screen p-4 md:p-6 mt-10">
             <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6">
