@@ -71,7 +71,7 @@ const fetchCartItems = async (req,res)=>{
 
         const cart = await Cart.findOne({userId}).populate({
             path: "items.productId",
-            select: "image title price salePrice",
+            select: "name image price salePrice",
         });
 
         if(!cart){
@@ -95,8 +95,8 @@ const fetchCartItems = async (req,res)=>{
 
         const populateCartItems = validItems.map(item => ({
             productId: item.productId._id,
+            name: item.productId.name, // Include the name
             image: item.productId.image,
-            title: item.productId.title,
             price: item.productId.price,
             salePrice: item.productId.salePrice,
             quantity: item.quantity,
@@ -133,11 +133,6 @@ const updateCartItemQty = async (req, res) => {
             });
         }
 
-        if (!userId) {
-            // Assign a unique ID for the guest user
-            userId = generateTemporaryUserId();
-        }
-
         const cart = await Cart.findOne({ userId });
 
         if (!cart) {
@@ -163,13 +158,13 @@ const updateCartItemQty = async (req, res) => {
 
         await cart.populate({
             path: "items.productId",
-            select: "image title price salePrice",
+            select: "name image price salePrice",
         });
 
         const populateCartItems = cart.items.map((item) => ({
             productId: item.productId ? item.productId._id : null,
             image: item.productId ? item.productId.image : null,
-            title: item.productId ? item.productId.title : "Product not found!",
+            name: item.productId ? item.productId.name : "Product not found!",
             price: item.productId ? item.productId.price : null,
             salePrice: item.productId ? item.productId.salePrice : null,
             quantity: item.quantity,
@@ -210,7 +205,7 @@ const deleteCartItem = async (req, res) => {
 
         const cart = await Cart.findOne({ userId }).populate({
             path: "items.productId",
-            select: "image title price salePrice",
+            select: "name image price salePrice",
         });
 
         if (!cart) {
@@ -238,7 +233,7 @@ const deleteCartItem = async (req, res) => {
         const populateCartItems = cart.items.map((item) => ({
             productId: item.productId ? item.productId._id : null,
             image: item.productId ? item.productId.image : null,
-            title: item.productId ? item.productId.title : "Product not found",
+            name: item.productId ? item.productId.name : "Product not found",
             price: item.productId ? item.productId.price : null,
             salePrice: item.productId ? item.productId.salePrice : null,
             quantity: item.quantity,
