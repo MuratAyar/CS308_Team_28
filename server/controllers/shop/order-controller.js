@@ -145,4 +145,18 @@ const getDeliveredOrders = async (req, res) => {
         res.status(500).json({ error: 'An error occurred while fetching products to deliver.' });
     }
 };
-module.exports = { createOrder, changeOrderStatus, getPendingOrders, getDeliveredOrders};
+
+const getOrderById = async (req, res) => {
+    const { orderId } = req.params;
+    try {
+      const order = await Order.findById(orderId);
+      if (!order) {
+        return res.status(404).json({ success: false, message: 'Order not found.' });
+      }
+      res.status(200).json({ success: true, order });
+    } catch (error) {
+      console.error('Error fetching order:', error);
+      res.status(500).json({ success: false, message: 'Error fetching order.' });
+    }
+  };
+module.exports = { createOrder, changeOrderStatus, getPendingOrders, getDeliveredOrders, getOrderById};

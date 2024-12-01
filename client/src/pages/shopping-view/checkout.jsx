@@ -117,7 +117,7 @@ function ShoppingCheckout() {
 
       if (response.data.success) {
         // Redirect or show success message
-        navigate(`/order-success/${response.data.orderId}`);
+        navigate(`/shop/order-success/${response.data.orderId}`);
       } else {
         setError(response.data.message);
       }
