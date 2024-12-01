@@ -100,21 +100,38 @@ function ShoppingHome() {
         setSortOption({ field, order });
         setCurrentPage(1); // Reset to the first page when sort option changes
     };
-
-    const handleAddToCart = async (productId, totalStock) => {
+   
+   
+   
+    const handleAddToCart = async (productId, quantityInStock) => {
         try {
+            // Print quantityInStock to the console
+            console.log(`Product ID: ${productId}, Quantity in Stock: ${quantityInStock}`);
+    
+            // Stock validation: Prevent adding a product if the stock is 0
+            if (quantityInStock <= 0) {
+                toast({
+                    title: "Out of Stock",
+                    description: "This product is out of stock and cannot be added to the cart.",
+                    variant: "destructive",
+                });
+                return;
+            }
+    
             // Retrieve cart items to check if the product already exists
             const currentCartItems = cartItems.items || [];
             const existingItemIndex = currentCartItems.findIndex(
-                (item) => item.productId === productId
+                (item) => item.productId.toString() === productId.toString()
             );
     
-            // Stock validation
+            // Stock validation: Prevent adding more than available stock
             if (existingItemIndex > -1) {
                 const currentQuantity = currentCartItems[existingItemIndex].quantity;
-                if (currentQuantity + 1 > totalStock) {
+                if (currentQuantity + 1 > quantityInStock) {
+                    console.log(`Current Quantity: ${currentQuantity}, Quantity in Stock: ${quantityInStock}`);
                     toast({
-                        title: `Only ${totalStock} quantity can be added for this item.`,
+                        title: `Stock Limit Exceeded`,
+                        description: `Only ${quantityInStock} items are available for this product.`,
                         variant: "destructive",
                     });
                     return;
@@ -129,16 +146,24 @@ function ShoppingHome() {
                 addToCart({
                     userId,
                     productId,
-                    quantity: 1,
+                    quantity:  1,
                 })
             );
+    
+            // Check if the backend operation was successful
+            if (!addToCartResponse?.payload?.success) {
+                console.error("Backend Error:", addToCartResponse?.payload?.message || "Unknown error");
+                toast({
+                    title: "Error Adding Product",
+                    description: addToCartResponse?.payload?.message || "Failed to add product to the cart.",
+                    variant: "destructive",
+                });
+                return;
+            }
     
             // Capture the backend-generated `guestId` for future use
             if (addToCartResponse?.payload?.guestId && !user?.id) {
                 userId = addToCartResponse.payload.guestId;
-    
-                // Optionally update Redux to save the guestId (if supported by your slice)
-                // dispatch(setGuestId(userId));
             }
     
             // Refresh the cart
@@ -156,6 +181,8 @@ function ShoppingHome() {
             });
         }
     };
+    
+    
     
     
 
@@ -318,8 +345,13 @@ function ShoppingHome() {
                                     <p className="mb-1">
                                         <strong>Category:</strong> {product.category}
                                     </p>
+                                    {product.quantityInStock === 0 && (
+                                    <p className="text-red-600 font-bold text-lg text-center w-full">Out of Stock</p>
+                                    )}
+                                    
                                     <Button
-                                        onClick={() => handleAddToCart(product._id)}
+                                        onClick={() => handleAddToCart(product._id,product.quantityInStock)}
+                                       
                                         className="mt-2 w-full"
                                     >
                                         Add to Cart
