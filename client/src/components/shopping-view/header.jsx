@@ -171,7 +171,7 @@ function ShoppingHeader() {
           {shoppingViewHeaderMenuItems.map((menuItem) => (
             menuItem.isSearch ? (
               // Search bar toggle for search item
-              <div key={menuItem.id} className="flex items-center gap-2 border rounded-full px-3 py-2 bg-white w-full w-72 ml-4">
+              <div key={menuItem.id} className="flex items-center gap-2 border rounded-full px-3 py-2 bg-white w-72 ml-4">
                 <Search className="h-5 w-5 text-gray-500" />
                 <input
                   type="text"
