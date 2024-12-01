@@ -5,6 +5,8 @@ import UserCartItemsContent from "@/components/shopping-view/cart-items-content"
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; // Import to navigate after order creation
+import { deleteCartItem } from "@/store/shop/cart-slice";
+import { useDispatch } from 'react-redux';
 
 function ShoppingCheckout() {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
@@ -14,9 +16,11 @@ function ShoppingCheckout() {
     cardNumber: "",
     expiryDate: "",
   });
-  const [addressInfo, setAddressInfo] = useState({}); // Assuming you collect address info
+  const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  console.log(currentSelectedAddress, "cartItems");
 
   // Total cart amount calculation
   const totalCartAmount =
@@ -69,6 +73,34 @@ function ShoppingCheckout() {
     }));
   };
 
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  const deleteAllCartItems = async (orderData) => {
+    try {
+      // Check if cartItems is available
+      if (!orderData || !Array.isArray(orderData.cartItems)) {
+        throw new Error("No cart items to delete or invalid data structure");
+      }
+  
+      // Loop through the cart items and delete them one by one
+      for (const item of orderData.cartItems) {
+        try {
+          await dispatch(deleteCartItem({ userId: orderData.userId, productId: item.productId }));
+          console.log(`Item ${item.productId} deleted successfully`);
+  
+          // Wait for 1-2 seconds before proceeding to the next request
+          await delay(1000 + Math.random() * 1000); // Random delay between 1-2 seconds
+        } catch (error) {
+          console.error(`Error deleting item ${item.productId}:`, error);
+        }
+      }
+  
+      console.log("All items processed for deletion");
+    } catch (error) {
+      console.error("Error deleting cart items:", error);
+    }
+  };
+  
+
   // Handle form submission
   const handleSubmit = async () => {
     // Check if user is authenticated
@@ -101,7 +133,14 @@ function ShoppingCheckout() {
     const orderData = {
       userId: user.id || user._id, // Use the correct property for user ID
       cartItems: cartItems.items,
-      addressInfo: addressInfo, // Assuming you've collected address info
+      addressInfo: {
+        addressId: currentSelectedAddress?._id,
+        address: currentSelectedAddress?.address,
+        city: currentSelectedAddress?.city,
+        pincode: currentSelectedAddress?.pincode,
+        phone: currentSelectedAddress?.phone,
+        notes: currentSelectedAddress?.notes,
+      },
       cardNumber: selectedPaymentMethod === "Card" ? cardDetails.cardNumber : "null",
       expiryDate: selectedPaymentMethod === "Card" ? formattedExpiryDate : "null",
       totalAmount: totalCartAmount,
@@ -116,6 +155,7 @@ function ShoppingCheckout() {
       );
 
       if (response.data.success) {
+        deleteAllCartItems(orderData);
         // Redirect or show success message
         navigate(`/shop/order-success/${response.data.orderId}`);
       } else {
@@ -142,7 +182,10 @@ function ShoppingCheckout() {
         {/* Optional banner image */}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-5 p-5">
-        <Address setAddressInfo={setAddressInfo} />
+        <Address
+          selectedId={currentSelectedAddress}
+          setCurrentSelectedAddress={setCurrentSelectedAddress}
+        />
         <div className="flex flex-col gap-4">
           {cartItems && cartItems.items && cartItems.items.length > 0 ? (
             cartItems.items.map((item) => (
