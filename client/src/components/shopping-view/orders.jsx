@@ -19,7 +19,7 @@ import {
 } from "@/store/shop/order-slice";
 import { Badge } from "../ui/badge";
 
-/* REAL SHOPPING Orders
+// REAL SHOPPING Orders
 function ShoppingOrders() {
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const dispatch = useDispatch();
@@ -105,9 +105,8 @@ function ShoppingOrders() {
     </Card>
   );
 }
-*/
 
-function ShoppingOrders() {
+/*function ShoppingOrders() {
   const orderList = []; // Temporary empty array for placeholder content
 
   return (
@@ -119,6 +118,6 @@ function ShoppingOrders() {
       )}
     </div>
   );
-}
+}*/
 
 export default ShoppingOrders;

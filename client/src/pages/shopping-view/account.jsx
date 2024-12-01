@@ -33,7 +33,7 @@ function ShoppingAccount() {
                 <TabsTrigger value="address">Address</TabsTrigger>
               </TabsList>
               <TabsContent value="orders">
-                <p>Order data not available yet.</p>
+                <ShoppingOrders />
               </TabsContent>
               <TabsContent value="address">
                 <Address />
