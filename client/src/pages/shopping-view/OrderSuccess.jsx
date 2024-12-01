@@ -15,13 +15,14 @@ function OrderSuccess() {
     const fetchOrder = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/shop/order/${orderId}`,
+          `http://localhost:5000/api/shop/order/details/${orderId}`,
           {
             withCredentials: true, // Include this if your backend requires authentication
           }
         );
+        console.log("Response: ", response.data);
         if (response.data.success) {
-          setOrder(response.data.order);
+          setOrder(response.data.data);
         } else {
           setError(true);
         }

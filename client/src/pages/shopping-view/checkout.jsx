@@ -167,11 +167,24 @@ function ShoppingCheckout() {
     }
   };
 
+  console.log(isAuthenticated)
+
   // Return early if user is not authenticated
   if (!isAuthenticated) {
     return (
-      <div>
-        <h1>Please log in to proceed with checkout</h1>
+      <div className="flex justify-center items-center h-screen bg-gray-100">
+        <div className="text-center p-6 bg-white rounded shadow-lg">
+          <h1 className="text-2xl font-semibold text-gray-700 mb-4">
+            Please log in to proceed with checkout
+          </h1>
+          <p className="text-gray-500 mb-6">You need to log in first to continue your purchase.</p>
+          <Button 
+            className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+            onClick={() => navigate('/auth/login')} // Assuming you have a login page route
+          >
+            Go to Login
+          </Button>
+        </div>
       </div>
     );
   }
