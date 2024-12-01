@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { User, House, LogOut, Menu, ShoppingCart, UserCog } from "lucide-react";
+import { User, House, LogOut, Menu, ShoppingCart, UserCog, Search } from "lucide-react";
 import {
   Link,
   useLocation,
@@ -128,6 +128,16 @@ function HeaderRightContent() {
 }
 
 function ShoppingHeader() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+
+  // Handle search function
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate(`/shop/home?query=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
   return (
     <header className="fixed top-0 z-40 w-full bg-background border-b">
       <div className="flex h-16 items-center justify-between px-4 md:px-6 w-full">
@@ -158,7 +168,32 @@ function ShoppingHeader() {
 
         {/* Menu items for larger screens */}
         <div className="hidden lg:flex items-center flex-grow">
-          <MenuItems />
+          {shoppingViewHeaderMenuItems.map((menuItem) => (
+            menuItem.isSearch ? (
+              // Search bar toggle for search item
+              <div key={menuItem.id} className="flex items-center gap-2 border rounded-full px-3 py-2 bg-white w-full w-72 ml-4">
+                <Search className="h-5 w-5 text-gray-500" />
+                <input
+                  type="text"
+                  placeholder="Search for products..."
+                  className="w-full px-2 py-1 outline-none text-sm bg-transparent"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                />
+                <button
+                  onClick={handleSearch}
+                  className="text-sm text-black-500 font-medium"
+                >
+                  Search
+                </button>
+              </div>
+            ) : (
+              <Link key={menuItem.id} to={menuItem.path} className="text-sm font-medium cursor-pointer ml-6">
+                {menuItem.label}
+              </Link>
+            )
+          ))}
         </div>
 
         {/* Right Section: Shopping cart and avatar icons */}

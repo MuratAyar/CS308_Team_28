@@ -1,10 +1,11 @@
 import React, { useEffect, useState, Fragment } from "react";
-import { ArrowUpDownIcon } from "lucide-react";
+import { ArrowUpDownIcon, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import ProductDetails from "@/components/shopping-view/product-details";
+import { useSearchParams } from "react-router-dom";
 
 function ShoppingHome() {
     const [products, setProducts] = useState([]);
@@ -41,6 +42,8 @@ function ShoppingHome() {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [product, setProduct] = useState(null)
 
+    const [searchParams] = useSearchParams(); // Get search parameters from the URL
+    const query = searchParams.get("query"); // Extract the search query from URL
 
     const handleProductClick = (product) => {
     setSelectedProduct(product);
@@ -198,6 +201,41 @@ function ShoppingHome() {
             });
         }
     };
+
+
+    useEffect(() => {
+        if (query) {
+            fetchProductsByQuery(query);
+        }
+    }, [query, currentPage, filters, sortOption]);
+
+    const fetchProductsByQuery = async (query) => {
+        setLoading(true);
+        try {
+            const queryParams = new URLSearchParams({
+                page: currentPage,
+                limit,
+                sort: sortOption.field,
+                order: sortOption.order,
+                ...filters,
+                query: query, // Include the search query in the params
+            }).toString();
+
+            const response = await fetch(
+                `http://localhost:5000/api/products/search?${queryParams}`
+            );
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            const data = await response.json();
+
+            setProducts(data);
+            setTotalPages(Math.ceil(data.length / limit)); // Adjust this if necessary for pagination
+        } catch (error) {
+            console.error("Error fetching products:", error);
+        }
+        setLoading(false);
+    };
     
     return (
         <div className="relative min-h-screen p-4 md:p-6 mt-10">
@@ -321,60 +359,63 @@ function ShoppingHome() {
                 {/* Products Section */}
                 <div className="bg-background w-full rounded-lg shadow-sm relative">
                     <div className="p-4 border-b flex items-center justify-between">
-                        <h2 className="text-lg font-extrabold">All Products</h2>
+                        <h2 className="text-lg font-extrabold">
+                            {query ? `All Products for "${query}"` : "All Products"}
+                        </h2>
                         <div className="flex items-center gap-1 border border-gray-300 rounded px-2 py-1 bg-white w-40 text-sm">
-                            <ArrowUpDownIcon className="h-4 w-4" />
-                            <select
-                                value={`${sortOption.field}-${sortOption.order}`}
-                                onChange={handleSortChange}
-                                className="outline-none text-sm bg-white font-semibold"
-                            >
-                                <option value="">Sort by</option>
-                                <option value="price-asc">Price: Low to High</option>
-                                <option value="price-desc">Price: High to Low</option>
-                                <option value="popularity-desc">Popularity</option>
-                            </select>
+                        <ArrowUpDownIcon className="h-4 w-4" />
+                        <select
+                            value={`${sortOption.field}-${sortOption.order}`}
+                            onChange={handleSortChange}
+                            className="outline-none text-sm bg-white font-semibold"
+                        >
+                            <option value="">Sort by</option>
+                            <option value="price-asc">Price: Low to High</option>
+                            <option value="price-desc">Price: High to Low</option>
+                            <option value="popularity-desc">Popularity</option>
+                        </select>
                         </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-                        {loading ? (
-                            <p>Loading products...</p>
-                        ) : (
-                            products.map((product) => (
-                                <div key={product._id} className="border p-4 rounded-lg">
-                                    <img
-                                    src={`/product-images/${product.image}`}
-                                    alt={product.name}
-                                    className="w-full h-40 object-cover mb-2 rounded"
-                                    onClick={() => handleProductClick(product)}
-                                    key={product._id}
-                                    />
-                                    <h3 className="font-bold text-lg mb-2">{product.name}</h3>
-                                    <p className="mb-2">{product.description}</p>
-                                    <p className="mb-1">
-                                        <strong>Price:</strong> ${product.price}
-                                    </p>
-                                    <p className="mb-1">
-                                        <strong>Brand:</strong> {product.brand}
-                                    </p>
-                                    <p className="mb-1">
-                                        <strong>Category:</strong> {product.category}
-                                    </p>
-                                    {product.quantityInStock === 0 && (
-                                    <p className="text-red-600 font-bold text-lg text-center w-full">Out of Stock</p>
-                                    )}
-                                    
-                                    <Button
-                                        onClick={() => handleAddToCart(product._id,product.quantityInStock)}
-                                       
-                                        className="mt-2 w-full"
-                                    >
-                                        Add to Cart
-                                    </Button>
-                                </div>
-                            ))
-                        )}
+    {loading ? (
+        <p>Loading products...</p>
+    ) : (
+        products.length > 0 ? (
+            products.map((product) => (
+                <div key={product._id} className="border p-4 rounded-lg flex flex-col h-full">
+                    <img
+                        src={`/product-images/${product.image}`}
+                        alt={product.name}
+                        className="w-full h-40 object-cover mb-2 rounded cursor-pointer"
+                        onClick={() => handleProductClick(product)}
+                    />
+                    <h3 className="font-bold text-lg mb-2">{product.name}</h3>
+                    <p className="mb-1"><strong>${product.price} </strong></p>
+                    <p className="mb-1"><strong>{product.brand}</strong></p>
+                    <p className="mb-2">{product.description}</p>
+
+                    {product.quantityInStock === 0 && (
+                        <p className="text-red-600 font-bold text-lg text-center w-full">Out of Stock</p>
+                    )}
+                    {/* Add to Cart button */}
+                    <div className="mt-auto w-full">
+                        <Button
+                            onClick={() => handleAddToCart(product._id, product.quantityInStock)}
+                            className="w-full"
+                        >
+                            Add to Cart
+                        </Button>
                     </div>
+                </div>
+            ))
+        ) : (
+            <p>No products found for "{query}"</p>
+        )
+    )}
+</div>
+
+
+
                 </div>
             </div>
 
@@ -391,7 +432,7 @@ function ShoppingHome() {
                         className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
                         onClick={handleCloseProductDetails}
                     >
-                        Close
+                        <X className="w-6 h-6" />
                     </button>
 
                     {/* Product Details Content */}
@@ -400,8 +441,7 @@ function ShoppingHome() {
                     </div>
                     </div>
                 </div>
-                )}
-
+            )}
 
             {/* Pagination Controls */}
             <div className="pagination-controls absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center items-center space-x-2">

@@ -66,28 +66,30 @@ const getFilterOptions = async (req, res) => {
 const searchProducts = async (req, res) => {
     let { query } = req.query;
 
-    
     query = query.trim();
 
-    
+    // Ensure the query is not empty
     if (!query) {
         return res.status(400).json({ error: 'Query must not be empty' });
     }
 
     try {
+        // Search for products where either the 'name' or 'description' matches the query (case-insensitive)
         const results = await Product.find({
             $or: [
-                { name: { $regex: new RegExp(query, 'i') } },
-                { description: { $regex: new RegExp(query, 'i') } }
+                { name: { $regex: new RegExp(query, 'i') } },  // Search in 'name'
+                { description: { $regex: new RegExp(query, 'i') } }  // Search in 'description'
             ]
         });
 
+        // Return the search results
         res.json(results);
     } catch (error) {
         console.error('Error searching products:', error);
         res.status(500).json({ error: 'Server error' });
     }
 };
+
 
 const getAllProducts = async (req, res) => {
     const { sort, order = 'asc', page = 1, limit = 10 } = req.query;
