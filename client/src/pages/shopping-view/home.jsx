@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import ProductDetails from "@/components/shopping-view/product-details";
 
 function ShoppingHome() {
     const [products, setProducts] = useState([]);
@@ -33,26 +34,29 @@ function ShoppingHome() {
     const { user } = useSelector((state) => state.auth);
     const { toast } = useToast();
     const [guestId, setGuestId] = useState(localStorage.getItem("guestId"));
+
+    const [isProductDetailsOpen, setProductDetailsOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [product, setProduct] = useState(null)
+
+
+    const handleProductClick = (product) => {
+    setSelectedProduct(product);
+    setProductDetailsOpen(true);
+    };
+    const [productId, setProductId] = useState(null);
+
+    const handleCloseProductDetails = () => {
+        setSelectedProduct(null);
+        setProductDetailsOpen(false);
+    };
   
     useEffect(() => {
         fetchFilterOptions();
         fetchProducts(currentPage);
     }, [currentPage, filters, sortOption]);
 
-    useEffect(() => {
-        const initializeCart = async () => {
-            if (!user?.id && !guestId) {
-                const response = await dispatch(fetchCartItems("unknown_user")); // Request backend to handle guest logic
-                if (response?.payload?.guestId) {
-                    setGuestId(response.payload.guestId);
-                    localStorage.setItem("guestId", response.payload.guestId);
-                }
-            }
-        };
-
-        initializeCart();
-    }, [dispatch, user?.id, guestId]);
-
+   
     const fetchFilterOptions = async () => {
         try {
             const response = await fetch("http://localhost:5000/api/products/filters");
@@ -112,30 +116,35 @@ function ShoppingHome() {
         setSortOption({ field, order });
         setCurrentPage(1); // Reset to the first page when sort option changes
     };
-
-    const handleAddToCart = (productId) => {
-        const currentUserId = user?.id || guestId;
+    const handleAddToCart = async (productId) => {
+        try {
+            const response = await dispatch(
+                addToCart({
+                    userId: user?.id || localStorage.getItem("guestId") || "unknown_user",
+                    productId,
+                    quantity: 1,
+                })
+            );
     
-        if (!currentUserId) {
-            console.error("Unable to identify user or guest.");
-            return;
+            if (response?.payload?.guestId) {
+                
+                localStorage.setItem("guestId", response.payload.guestId);
+            }
+    
+            if (response?.payload?.success) {
+                toast({
+                    title: "Product added to cart successfully",
+                });
+               
+                await dispatch(fetchCartItems(user?.id || localStorage.getItem("guestId")));
+            } else {
+                console.error("Failed to add product to cart:", response?.payload?.message);
+            }
+        } catch (error) {
+            console.error("Error adding product to cart:", error);
         }
-    
-        dispatch(addToCart({ userId: currentUserId, productId: productId, quantity: 1 }))
-            .then((data) => {
-                if (data?.payload?.success) {
-                    toast({
-                        title: "Product added to cart successfully",
-                    });
-                    dispatch(fetchCartItems(currentUserId)); // Update cart items for the current user or guest
-                } else {
-                    console.error("Failed to add product to cart.");
-                }
-            })
-            .catch((error) => {
-                console.error("Error adding product to cart:", error);
-            });
     };
+    
     
 
     return (
@@ -282,9 +291,11 @@ function ShoppingHome() {
                             products.map((product) => (
                                 <div key={product._id} className="border p-4 rounded-lg">
                                     <img
-                                        src={`/product-images/${product.image}`}
-                                        alt={product.name}
-                                        className="w-full h-40 object-cover mb-2 rounded"
+                                    src={`/product-images/${product.image}`}
+                                    alt={product.name}
+                                    className="w-full h-40 object-cover mb-2 rounded"
+                                    onClick={() => handleProductClick(product)}
+                                    key={product._id}
                                     />
                                     <h3 className="font-bold text-lg mb-2">{product.name}</h3>
                                     <p className="mb-2">{product.description}</p>
@@ -309,6 +320,31 @@ function ShoppingHome() {
                     </div>
                 </div>
             </div>
+
+            {isProductDetailsOpen && selectedProduct && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+                    onClick={handleCloseProductDetails} // Close modal on background click
+                >
+                    <div
+                    className="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl h-auto max-h-[80vh] overflow-y-auto relative"
+                    onClick={(e) => e.stopPropagation()} // Prevent modal close on content click
+                    >
+                    <button
+                        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                        onClick={handleCloseProductDetails}
+                    >
+                        Close
+                    </button>
+
+                    {/* Product Details Content */}
+                    <div>
+                        <ProductDetails productId={selectedProduct._id} />
+                    </div>
+                    </div>
+                </div>
+                )}
+
 
             {/* Pagination Controls */}
             <div className="pagination-controls absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center items-center space-x-2">
