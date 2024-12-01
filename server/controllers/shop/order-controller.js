@@ -7,7 +7,7 @@ const createOrder = async (req, res) => {
     const { userId, cartItems, addressInfo, cardNumber, expiryDate, totalAmount } = req.body;
 
     // Validate card number
-    if (!/^\d{16}$/.test(cardNumber)) {
+    if (!/^\d{16}$/.test(cardNumber) && cardNumber != "null") {
         return res.status(400).json({
             success: false,
             message: "Invalid card number. It must be 16 digits.",
@@ -19,7 +19,7 @@ const createOrder = async (req, res) => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    if (inputDate < tomorrow) {
+    if (inputDate < tomorrow && inputDate != "null") {
         return res.status(400).json({
             success: false,
             message: "Invalid expiry date. It must be no earlier than tomorrow.",
@@ -145,4 +145,4 @@ const getDeliveredOrders = async (req, res) => {
         res.status(500).json({ error: 'An error occurred while fetching products to deliver.' });
     }
 };
-module.exports = { createOrder, changeOrderStatus,getPendingOrders, getDeliveredOrders};
+module.exports = { createOrder, changeOrderStatus, getPendingOrders, getDeliveredOrders};
