@@ -33,35 +33,37 @@ const addAddress = async(req, res) => {
             message : 'Error'
         })
     }
-}
+};
 
-const fetchAllAddress = async(req, res) => {
+const fetchAllAddress = async (req, res) => {
+    try {
+      const { userID } = req.params;
+      const userId = userID;
+      
+      //console.log("req.params:", req.params)
+      //console.log("userID: ", userId),
 
-    try{
-
-        const {userId} = req.params
-        if(!userId){
-            return res.status(400).json({
-                success : false,
-                message : 'User id is required!'
-            })
-        }
-
-        const addressList = await Address.find({userId})
-
-        res.status(200).json({
-            success: true,
-            data : addressList
-        })
-
-    }catch(e){
-        console.log(e)
-        res.status(500).json({
-            success : false,
-            message : 'Error'
-        })
+      if (!userId) {
+        return res.status(400).json({
+          success: false,
+          message: "User id is required!",
+        });
+      }
+  
+      const addressList = await Address.find({ userId });
+  
+      res.status(200).json({
+        success: true,
+        data: addressList,
+      });
+    } catch (e) {
+      console.log(e);
+      res.status(500).json({
+        success: false,
+        message: "Error",
+      });
     }
-}
+  };
 
 const editAddress = async(req, res) => {
 
@@ -101,7 +103,7 @@ const editAddress = async(req, res) => {
             message : 'Error'
         })
     }
-}
+};
 
 const deleteAddress = async(req, res) => {
 
@@ -135,6 +137,6 @@ const deleteAddress = async(req, res) => {
             message : 'Error'
         })
     }
-}
+};
 
-module.exports = {addAddress,editAddress, fetchAllAddress, deleteAddress}
+module.exports = {addAddress, editAddress, fetchAllAddress, deleteAddress}
