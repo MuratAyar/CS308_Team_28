@@ -71,7 +71,7 @@ const fetchCartItems = async (req,res)=>{
 
         const cart = await Cart.findOne({userId}).populate({
             path: "items.productId",
-            select: "name image price salePrice",
+            select: "name image price salePrice quantityInStock",
         });
 
         if(!cart){
@@ -100,6 +100,7 @@ const fetchCartItems = async (req,res)=>{
             price: item.productId.price,
             salePrice: item.productId.salePrice,
             quantity: item.quantity,
+            quantityInStock: item.productId.quantityInStock,
 
         }));
 
@@ -132,7 +133,7 @@ const updateCartItemQty = async (req, res) => {
                 message: "Invalid data provided!",
             });
         }
-
+            
         const cart = await Cart.findOne({ userId });
 
         if (!cart) {
@@ -152,13 +153,13 @@ const updateCartItemQty = async (req, res) => {
                 message: "Cart item not present!",
             });
         }
-
+        
         cart.items[findCurrentProductIndex].quantity = Number(quantity);
         await cart.save();
 
         await cart.populate({
             path: "items.productId",
-            select: "name image price salePrice",
+            select: "name image price salePrice quantityInStock",
         });
 
         const populateCartItems = cart.items.map((item) => ({
@@ -168,6 +169,8 @@ const updateCartItemQty = async (req, res) => {
             price: item.productId ? item.productId.price : null,
             salePrice: item.productId ? item.productId.salePrice : null,
             quantity: item.quantity,
+            quantityInStock: item.productId.quantityInStock,
+            
         }));
 
         res.status(200).json({
@@ -258,5 +261,5 @@ const deleteCartItem = async (req, res) => {
 
 module.exports = {
     addToCart,
-    updateCartItemQty, deleteCartItem, fetchCartItems
+    updateCartItemQty, deleteCartItem, fetchCartItems,
 }

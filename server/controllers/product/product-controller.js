@@ -23,7 +23,6 @@ const getFilteredProducts = async (req, res) => {
   }
 };
 
-
 const getFilterOptions = async (req, res) => {
   try {
       // Get distinct values for each filter field
@@ -306,10 +305,11 @@ const filterProducts = async (req, res) => {
             user: req.user.id, // Authenticated user ID
             productId, // Link to the product
             content: text, // Comment text
+            isApproved: "pending", // Automatically set to false
         });
 
         return res.status(201).json({
-            message: 'Comment added successfully',
+            message: 'Comment added successfully and awaiting approval',
             comment: newComment,
         });
     } catch (err) {
@@ -320,7 +320,7 @@ const filterProducts = async (req, res) => {
 
 const addRating = async (req, res) => {
   const { productId } = req.params;
-  const { rating } = req.body;  // Only expecting rating
+  const { rating } = req.body; // Only expecting rating
 
   try {
       console.log("Product ID:", productId);
@@ -342,15 +342,23 @@ const addRating = async (req, res) => {
           return res.status(400).json({ message: 'Rating must be between 1 and 5' });
       }
 
-      // Update the product's rating (assumes no comment logic)
-      product.rating = rating;  // Directly assign the rating
+      // Update the product's rating
+      product.totalRatings += rating; // Add new rating to total
+      product.numberOfRatings += 1; // Increment the number of ratings
+      product.rating = (product.totalRatings / product.numberOfRatings).toFixed(2); // Recalculate average with 2 decimals
 
       // Save the product with updated rating
       await product.save();
 
       res.status(200).json({
           message: 'Rating added successfully',
-          product,
+          product: {
+              id: product._id,
+              name: product.name,
+              rating: product.rating,
+              totalRatings: product.totalRatings,
+              numberOfRatings: product.numberOfRatings,
+          },
       });
   } catch (err) {
       console.error("Error in addRating:", err);
@@ -359,5 +367,112 @@ const addRating = async (req, res) => {
 };
 
 
+const getCommentsByProduct = async (req, res) => {
+  const { productId } = req.params;
+
+  try {
+      // Validate the productId
+      if (!mongoose.Types.ObjectId.isValid(productId)) {
+          return res.status(400).json({ message: 'Invalid product ID' });
+      }
+
+      // Find comments where isApproved is true and match the productId
+      const comments = await Comment.find({ productId, isApproved: "true" })
+          .populate('user', 'userName') // Optional: Populate user details (e.g., userName)
+          .sort({ timestamp: -1 }); // Sort by newest comments first
+
+      // If no comments are found, return an empty array instead of a 404 error
+      if (comments.length === 0) {
+          return res.status(200).json([]); // Return empty array instead of 404
+      }
+
+      res.status(200).json({
+          message: 'Approved comments retrieved successfully',
+          comments,
+      });
+  } catch (err) {
+      console.error('Error in getCommentsByProduct:', err);
+      res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+const getProductDetails = async (req, res) => {
+  const { productId } = req.params;
+
+  try {
+      // Validate the productId
+      if (!mongoose.Types.ObjectId.isValid(productId)) {
+          return res.status(400).json({ message: 'Invalid product ID' });
+      }
+
+      // Find the product by ID, including its rating and other necessary fields
+      const product = await Product.findById(productId, {
+          name: 1,
+          model: 1,
+          description: 1,
+          brand: 1,
+          price: 1,
+          category: 1,
+          gender: 1,
+          image: 1,
+          rating: 1, // Include the average rating stored in the model
+      });
+
+      if (!product) {
+          return res.status(404).json({ message: 'Product not found' });
+      }
+
+      res.status(200).json({
+          product: {
+              ...product._doc, // Spread the product fields
+              rating: product.rating ? product.rating.toFixed(2) : 'No ratings yet', // Format the rating
+          },
+      });
+  } catch (error) {
+      console.error('Error fetching product details:', error);
+      res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const updateCommentApproval = async (req, res) => {
+  const { commentId } = req.params;  // Extract the commentId from the URL
+  const { isApproved } = req.body;   // Extract the isApproved status from the request body
+
+  // Validate `isApproved`
+  const validStatuses = ["true", "false"];
+  if (!validStatuses.includes(isApproved)) {
+      return res.status(400).json({ message: "Invalid approval status. Use 'true' or 'false'." });
+  }
+
+  try {
+      // Validate ObjectId
+      if (!mongoose.Types.ObjectId.isValid(commentId)) {
+          return res.status(400).json({ message: "Invalid comment ID." });
+      }
+
+      // Find the comment and update the approval status
+      const updatedComment = await Comment.findByIdAndUpdate(
+          commentId,  // We use commentId to find the comment
+          { isApproved },  // Update the approval status
+          { new: true }  // Return the updated document
+      );
+
+      if (!updatedComment) {
+          return res.status(404).json({ message: "Comment not found." });
+      }
+
+      res.status(200).json({
+          message: "Comment approval status updated successfully.",
+          comment: updatedComment,
+      });
+  } catch (err) {
+      console.error("Error in updateCommentApproval:", err);
+      res.status(500).json({ message: "Server error." });
+  }
+};
+
+
   module.exports = {getFilteredProducts, getFilterOptions, searchProducts, deleteProduct, updateStock, 
-    getAllProducts, getIds, addProduct, filterProducts, addComment, addRating,}
+    getAllProducts, getIds, addProduct, filterProducts, addComment, addRating, getCommentsByProduct, 
+    getProductDetails, updateCommentApproval}

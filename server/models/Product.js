@@ -10,7 +10,9 @@ const productSchema = new mongoose.Schema({
     warrantyStatus: { type: Boolean },
     distributor: { type: String },
     popularity: { type: Number, default: 0 },
-    rating: { type: Number },  // This is the field we're updating
+    rating: { type: Number, default: 0 },
+    totalRatings: { type: Number, default: 0 }, // Total sum of ratings
+    numberOfRatings: { type: Number, default: 0 }, // Number of ratings
     category: { type: String },
     gender: { type: String, enum: ['male', 'female', 'unisex'] },
     brand: { type: String },

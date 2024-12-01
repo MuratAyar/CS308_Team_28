@@ -5,6 +5,8 @@ const commentSchema = new mongoose.Schema({
     productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true }, 
     content: { type: String, required: true }, // The actual comment text
     timestamp: { type: Date, default: Date.now }, // When the comment was made
+    isApproved: { type: String, default: 'pending' // Default status is 'pending'
+    },
 });
 
 module.exports = mongoose.model('Comment', commentSchema);

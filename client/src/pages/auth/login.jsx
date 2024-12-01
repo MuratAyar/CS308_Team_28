@@ -20,17 +20,22 @@ const initialState = {
     const {toast} = useToast();
     function onSubmit(event) {
         event.preventDefault()
-        dispatch(loginUser(formData)).then(data =>{
-          if(data?.payload?.success){
-            toast({
-                title: data?.payload?.message
-            });
-          }
-          else{
-            toast({
-            title: data?.payload?.message,
-            variant: "destructive"
-            });
+        dispatch(loginUser(formData)).then((data) => {
+          if (data?.payload?.success) {
+              // Store the token in localStorage
+              localStorage.setItem("authToken", data?.payload?.token); // Assuming `token` is part of the payload
+              console.log("Token stored in localStorage:", data?.payload?.token);
+  
+              // Show success toast
+              toast({
+                  title: data?.payload?.message,
+              });
+          } else {
+              // Show error toast
+              toast({
+                  title: data?.payload?.message,
+                  variant: "destructive",
+              });
           }
       });
     }

@@ -10,30 +10,55 @@ function UserCartItemsContent({ cartItem, guestId }) {
     const dispatch = useDispatch();
     const { toast } = useToast();
     const { cartItems } = useSelector((state) => state.shopCart);
+    const { productList } = useSelector((state) => state.shopProducts);
 
     
     console.log("Cart Item:", cartItem);
     const userId = user?.id ||  cartItems?.userId;
-
+   
     const handleUpdateQuantity = async (getCartItem, typeOfAction) => {
       
-          dispatch(
-            updateCartItemQty({
-              userId: userId,
+  
+      const getTotalStock = getCartItem?.quantityInStock;
+      
+
+      let getCartItems = cartItems.items || [];
+      if (typeOfAction === "plus" && getCartItem.quantity + 1 > getTotalStock) {
+        
+          toast({
+              title: `Only ${getTotalStock} items are available in stock.`,
+              variant: "destructive",
+          });
+         
+          return;
+          
+
+      }
+  
+  
+      dispatch(
+          updateCartItemQty({
+              userId,
               productId: getCartItem?.productId,
               quantity:
-                typeOfAction === "plus"
-                  ? getCartItem?.quantity + 1
-                  : getCartItem?.quantity - 1,
-            })
-          ).then((data) => {
-            if (data?.payload?.success) {
+                  typeOfAction === "plus"
+                      ? getCartItem?.quantity + 1
+                      : getCartItem?.quantity - 1,
+          })
+      ).then((data) => {
+          if (data?.payload?.success) {
               toast({
-                title: "Cart item is updated successfully",
+                  title: "Cart item updated successfully!",
               });
-            }
-          });
-    };
+          } else {
+              toast({
+                  title: "Failed to update cart item. Please try again.",
+                  variant: "destructive",
+              });
+          }
+      });
+  };
+  
 
     const handleCartItemDelete = async (getCartItem) => {
         dispatch(

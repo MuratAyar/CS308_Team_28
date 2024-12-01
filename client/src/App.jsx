@@ -21,7 +21,13 @@ import { useSelector } from "react-redux"
 import ConfirmationDeletion from "./pages/shopping-view/ConfirmDeletion";
 import DeleteAccount from "./pages/shopping-view/DeleteAccount";
 import AccountDeleted from "./pages/shopping-view/AccountDeleted";
-import OrderSuccess from "./pages/shopping-view/OrderSuccess"; 
+import OrderSuccess from "./pages/shopping-view/OrderSuccess";
+
+import ProductManagerLayout from "./components/product-manager-view/layout";
+import DashboardPage from "./pages/product-manager-view/dashboard";
+import ManageComments from "./pages/product-manager-view/comments";
+import ManageProducts from "./pages/product-manager-view/products";
+
 
 function App() {
   const {user, isAuthenticated} = useSelector((state)=> state.auth)
@@ -76,7 +82,11 @@ function App() {
         <Route path="unauth-page" element={<UnAuthPage/>}/>
         <Route path="*" element={<NotFound/>}/>
 
-        
+        <Route path="/pmanager" element={<ProductManagerLayout />}>
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="manage-comments" element={<ManageComments />} />
+          <Route path="manage-products" element={<ManageProducts />} />
+        </Route>
 
       </Routes>
     </div>

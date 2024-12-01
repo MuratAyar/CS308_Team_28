@@ -7,7 +7,7 @@ const dotenv = require("dotenv");
 const productRoutes = require('./routes/product-routes');
 const path = require('path');
 const shopAddressRouter = require("./routes/shop/address-route")
-const shopProductsRouter = require("./routes/shop/products-routes");
+// const shopProductsRouter = require("./routes/shop/products-routes");
 const shopCartRouter = require("./routes/shop/cart-routes");
 const shopOrderRouter = require("./routes/shop/order-routes");
 
@@ -49,7 +49,7 @@ app.use('/api/products', productRoutes);
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use("/api/shop/address", shopAddressRouter)
-app.use('/api/shop/products', shopProductsRouter);
+app.use('/api/shop/products', productRoutes);
 app.use('/api/shop/cart', shopCartRouter);
 app.use("/api/shop/order", shopOrderRouter);
 app.use('/api/products', productRoutes);

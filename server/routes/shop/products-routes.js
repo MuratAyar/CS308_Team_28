@@ -1,11 +1,11 @@
-const express = require("express");
+// const express = require("express");
 
-const {
-  getFilteredProducts,
-} = require("../../controllers/shop/products-controller");
+// const {
+//   getFilteredProducts,
+// } = require("../../controllers/shop/products-controller");
 
-const router = express.Router();
+// const router = express.Router();
 
-router.get("/get", getFilteredProducts);
+// router.get("/get", getFilteredProducts);
 
-module.exports = router;
+// module.exports = router;

@@ -4,11 +4,11 @@ const Product = require('../models/Product');
 const Comment = require('../models/Comment')
 const {authorizeRole, authenticateToken} = require('../middleware/index')
 const {getFilterOptions, searchProducts, updateStock, getAllProducts, filterProducts, 
-  addProduct, getIds, deleteProduct, addRating, addComment} = require('../controllers/product/product-controller')
-
+  addProduct, getIds, deleteProduct, addRating, addComment, getCommentsByProduct, 
+  getProductDetails, updateCommentApproval} = require('../controllers/product/product-controller')
 
 router.get('/filters', getFilterOptions);
-
+router.get('/:productId/details', getProductDetails);
 router.get('/search', searchProducts);
 // Route to Get All Products with Sorting and Pagination
 router.get('/all', getAllProducts);
@@ -21,7 +21,11 @@ router.post('/add', addProduct);
 router.post('/get-ids', getIds);
 // Delete a product by _id (as query parameter)
 router.delete('/delete', deleteProduct);
+
+//comment and rating endpoints
 router.post('/:productId/comment', authenticateToken, addComment);
 router.post('/:productId/rating', authenticateToken, addRating);
+router.get('/:productId/comments', getCommentsByProduct);
+router.put('/:commentId/update-approval', authenticateToken, authorizeRole('product'), updateCommentApproval);
 
   module.exports = router;
