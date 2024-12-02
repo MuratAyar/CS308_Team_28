@@ -418,7 +418,8 @@ const getProductDetails = async (req, res) => {
           category: 1,
           gender: 1,
           image: 1,
-          rating: 1, // Include the average rating stored in the model
+          rating: 1, 
+          quantityInStock: 1,
       });
 
       if (!product) {

@@ -12,7 +12,7 @@ function ShoppingHome() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
-    const limit = 4; // Number of products per page
+    const limit = 12; // Number of products per page
     const [filters, setFilters] = useState({
         category: "",
         brand: "",
@@ -377,45 +377,42 @@ function ShoppingHome() {
                         </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-    {loading ? (
-        <p>Loading products...</p>
-    ) : (
-        products.length > 0 ? (
-            products.map((product) => (
-                <div key={product._id} className="border p-4 rounded-lg flex flex-col h-full">
-                    <img
-                        src={`/product-images/${product.image}`}
-                        alt={product.name}
-                        className="w-full h-40 object-cover mb-2 rounded cursor-pointer"
-                        onClick={() => handleProductClick(product)}
-                    />
-                    <h3 className="font-bold text-lg mb-2">{product.name}</h3>
-                    <p className="mb-1"><strong>${product.price} </strong></p>
-                    <p className="mb-1"><strong>{product.brand}</strong></p>
-                    <p className="mb-2">{product.description}</p>
+                        {loading ? (
+                            <p>Loading products...</p>
+                        ) : (
+                            products.length > 0 ? (
+                                products.map((product) => (
+                                    <div key={product._id} className="border p-4 rounded-lg flex flex-col h-full">
+                                        <img
+                                            src={`/product-images/${product.image}`}
+                                            alt={product.name}
+                                            className="w-full h-40 object-cover mb-2 rounded cursor-pointer"
+                                            onClick={() => handleProductClick(product)}
+                                        />
+                                        <h3 className="font-bold text-lg mb-2">{product.name}</h3>
+                                        <p className="mb-1"><strong>${product.price} </strong></p>
+                                        <p className="mb-1"><strong>{product.brand}</strong></p>
+                                        <p className="mb-2">{product.description}</p>
 
-                    {product.quantityInStock === 0 && (
-                        <p className="text-red-600 font-bold text-lg text-center w-full">Out of Stock</p>
-                    )}
-                    {/* Add to Cart button */}
-                    <div className="mt-auto w-full">
-                        <Button
-                            onClick={() => handleAddToCart(product._id, product.quantityInStock)}
-                            className="w-full"
-                        >
-                            Add to Cart
-                        </Button>
+                                        {product.quantityInStock === 0 && (
+                                            <p className="text-red-600 font-bold text-lg text-center w-full">Out of Stock</p>
+                                        )}
+                                        {/* Add to Cart button */}
+                                        <div className="mt-auto w-full">
+                                            <Button
+                                                onClick={() => handleAddToCart(product._id, product.quantityInStock)}
+                                                className="w-full"
+                                            >
+                                                Add to Cart
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p>No products found for "{query}"</p>
+                            )
+                        )}
                     </div>
-                </div>
-            ))
-        ) : (
-            <p>No products found for "{query}"</p>
-        )
-    )}
-</div>
-
-
-
                 </div>
             </div>
 
@@ -444,7 +441,7 @@ function ShoppingHome() {
             )}
 
             {/* Pagination Controls */}
-            <div className="pagination-controls absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center items-center space-x-2">
+            <div className="pagination-controls flex justify-center items-center space-x-2 mt-4">
                 <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}

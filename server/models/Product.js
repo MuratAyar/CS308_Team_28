@@ -14,7 +14,7 @@ const productSchema = new mongoose.Schema({
     totalRatings: { type: Number, default: 0 }, // Total sum of ratings
     numberOfRatings: { type: Number, default: 0 }, // Number of ratings
     category: { type: String },
-    gender: { type: String, enum: ['male', 'female', 'unisex'] },
+    gender: { type: String, enum: ['Women', 'Men', 'Unisex'] },
     brand: { type: String },
     image: { type: String },
 });

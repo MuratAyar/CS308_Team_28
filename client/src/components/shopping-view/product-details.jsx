@@ -167,6 +167,7 @@ const ProductDetails = ({ productId }) => {
           <p><strong>Category:</strong> {product.category}</p>
           <p><strong>Gender:</strong> {product.gender}</p>
           <p><strong>Brand:</strong> {product.brand}</p>
+          <p><strong>Stock:</strong> {product.quantityInStock}</p>
         </div>
 
         {/* Comments Section */}
