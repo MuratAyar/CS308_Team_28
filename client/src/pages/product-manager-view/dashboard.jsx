@@ -1,42 +1,42 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import Sidebar from '@/components/product-manager-view/sidebar';
-import Header from '@/components/product-manager-view/header';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { UserCog } from "lucide-react";
+import Address from "@/components/shopping-view/address";
+import PendingComments from "@/components/product-manager-view/pending-comments";
+import { useNavigate } from "react-router-dom"; // Added to enable navigation
+import { useSelector } from "react-redux"; // Added to access user info from Redux
 
-const DashboardPage = () => {
-  return (
-    <div className="dashboard-container">
-      <Sidebar />
-      <div className="main-content">
-        <Header />
-        <div className="dashboard-content">
-          <h2>Product Manager Dashboard</h2>
-          <div className="overview">
-            <div className="overview-item">
-              <h3>Pending Comments</h3>
-              <p>5</p>
-            </div>
-            <div className="overview-item">
-              <h3>Approved Comments</h3>
-              <p>50</p>
-            </div>
-            <div className="overview-item">
-              <h3>Total Products</h3>
-              <p>120</p>
-            </div>
-          </div>
-          <div className="action-buttons">
-            <Link to="/manage-comments">
-              <button>Manage Comments</button>
-            </Link>
-            <Link to="/manage-products">
-              <button>Manage Products</button>
-            </Link>
+function ShoppingAccount() {
+  const user = useSelector((state) => state.auth.user); // Access user data from Redux
+  const navigate = useNavigate();
+
+  const handleDeleteAccount = () => {
+      // Navigate to the confirm-delete page with user info
+      navigate("/shop/account/confirm-delete", { state: { user } });
+  };
+
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen"> {/* Centers content vertically and horizontally */}
+        <div className="relative h-[200px] w-[200px] overflow-hidden"> {/* Adjust width and height as needed */}
+          <UserCog className="h-full w-full object-cover object-center" />
+        </div>
+        <div className="container mx-auto grid grid-cols-1 gap-8 py-8">
+          <div className="flex flex-col rounded-lg border bg-background p-6 shadow-sm">
+            <Tabs defaultValue="comments">
+              <TabsList>
+                <TabsTrigger value="comments">Pending Comments</TabsTrigger>
+                <TabsTrigger value="products">Products</TabsTrigger>
+              </TabsList>
+              <TabsContent value="comments">
+                <PendingComments />
+              </TabsContent>
+              <TabsContent value="products">
+                {/* <Products /> */}
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-export default DashboardPage;
+    );
+  }
+  
+  export default ShoppingAccount;

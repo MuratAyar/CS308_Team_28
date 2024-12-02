@@ -474,7 +474,21 @@ const updateCommentApproval = async (req, res) => {
   }
 };
 
+const getPendingComments = async (req, res) => {
+    try {
+        // Fetch comments with `isApproved` set to 'pending'
+        const pendingComments = await Comment.find({ isApproved: 'pending' })
+            .populate('user', 'name email') // Populate user details
+            .populate('productId', 'name'); // Populate product details
+
+        // Return the pending comments in response
+        res.status(200).json({ success: true, data: pendingComments });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server error. Unable to fetch pending comments.' });
+    }
+};
 
   module.exports = {getFilteredProducts, getFilterOptions, searchProducts, deleteProduct, updateStock, 
     getAllProducts, getIds, addProduct, filterProducts, addComment, addRating, getCommentsByProduct, 
-    getProductDetails, updateCommentApproval}
+    getProductDetails, updateCommentApproval, getPendingComments}

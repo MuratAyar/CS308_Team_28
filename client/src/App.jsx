@@ -25,8 +25,6 @@ import OrderSuccess from "./pages/shopping-view/OrderSuccess";
 
 import ProductManagerLayout from "./components/product-manager-view/layout";
 import DashboardPage from "./pages/product-manager-view/dashboard";
-import ManageComments from "./pages/product-manager-view/comments";
-import ManageProducts from "./pages/product-manager-view/products";
 
 
 function App() {
@@ -84,8 +82,6 @@ function App() {
 
         <Route path="/pmanager" element={<ProductManagerLayout />}>
           <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="manage-comments" element={<ManageComments />} />
-          <Route path="manage-products" element={<ManageProducts />} />
         </Route>
 
       </Routes>
