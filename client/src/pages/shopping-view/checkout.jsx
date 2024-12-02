@@ -191,8 +191,12 @@ function ShoppingCheckout() {
 
   return (
     <div className="flex flex-col">
-      <div className="relative h-[300px] w-full overflow-hidden">
-        {/* Optional banner image */}
+      <div className="relative h-[300px] w-full overflow-hidden mt-4">
+      <img
+        src="/checkout-image/28.png" 
+        alt="Checkout Banner"
+        className="w-full h-full object-contain"
+      />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-5 p-5">
         <Address
