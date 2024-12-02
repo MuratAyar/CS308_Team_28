@@ -1,4 +1,5 @@
 const Order = require("../../models/Order");
+const Product = require('../../models/Product');
 const { sendInvoiceEmail } = require("../../services/mailService");
 const User = require('../../models/User'); // Adjust the path as necessary
 
@@ -37,10 +38,27 @@ const createOrder = async (req, res) => {
             expiryDate,
             orderStatus: "processing",
             paymentMethod: "Card",
-            paymentStatus: "Pending",
+            paymentStatus: "Done",
         });
 
         await newOrder.save();
+
+        for (const item of cartItems) {
+            const product = await Product.findById(item.productId);
+
+            if (product) {
+                // Ensure there is enough stock before updating
+                if (product.quantityInStock >= item.quantity) {
+                    product.quantityInStock -= item.quantity; // Decrease stock
+                    product.popularity += 1; // Increase popularity
+                    await product.save(); // Save the updated product
+                } else {
+                    throw new Error(`Insufficient stock for product: ${product.name}`);
+                }
+            } else {
+                throw new Error(`Product not found: ${item.productId}`);
+            }
+        }
 
         // Fetch user's email from the database
         const user = await User.findById(userId);

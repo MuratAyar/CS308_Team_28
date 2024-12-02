@@ -6,7 +6,7 @@ function AuthLayout() {
             {/* Left Side */}
             <div className="lg:flex items-center justify-center bg-black w-1/2 px-12 py-10 rounded-r-lg shadow-lg">
                 <div className="max-w-md space-y-6 text-center text-white">
-                    <h1 className="text-5xl font-extrabold tracking-tight">Welcome to E-Commerce Shopping</h1>
+                    <h1 className="text-5xl font-extrabold tracking-tight">Welcome to TwoEight!</h1>
                     <p className="text-lg">Shop the best products at unbeatable prices!</p>
                 </div>
             </div>

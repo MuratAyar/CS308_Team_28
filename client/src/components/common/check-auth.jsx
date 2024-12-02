@@ -33,7 +33,11 @@ function CheckAuth({ isAuthenticated, user, children }) {
       ) {
         if (user?.role === "admin") {
           return <Navigate to="/admin/dashboard" />;
-        } else {
+        } 
+        else if(user?.role === "product"){
+          return <Navigate to="/pmanager/dashboard" />;
+        }
+        else {
           return <Navigate to="/shop/home" />;
         }
       }
