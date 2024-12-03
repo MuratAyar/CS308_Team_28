@@ -66,14 +66,15 @@ const getFilterOptions = async (req, res) => {
 const searchProducts = async (req, res) => {
     let { query } = req.query;
 
-    query = query.trim();
-
-    // Ensure the query is not empty
-    if (!query) {
-        return res.status(400).json({ error: 'Query must not be empty' });
-    }
+    query = query ? query.trim() : "";  // Ensure query is empty string if it's undefined
 
     try {
+        // If query is empty, return all products
+        if (!query) {
+            const allProducts = await Product.find();  // Fetch all products
+            return res.json(allProducts);  // Send the response with all products
+        }
+
         // Search for products where either the 'name' or 'description' matches the query (case-insensitive)
         const results = await Product.find({
             $or: [
@@ -89,7 +90,6 @@ const searchProducts = async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 };
-
 
 const getAllProducts = async (req, res) => {
     const { sort, order = 'asc', page = 1, limit = 10 } = req.query;

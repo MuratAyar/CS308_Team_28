@@ -55,11 +55,6 @@ function ShoppingHome() {
         setSelectedProduct(null);
         setProductDetailsOpen(false);
     };
-  
-    useEffect(() => {
-        fetchFilterOptions();
-        fetchProducts(currentPage);
-    }, [currentPage, filters, sortOption]);
 
     const fetchFilterOptions = async () => {
         try {
@@ -74,32 +69,50 @@ function ShoppingHome() {
         }
     };
 
-    const fetchProducts = async (page) => {
+    useEffect(() => {
+        fetchFilterOptions();   
+        const currentQuery = query || ""; // Ensure query is not null
+        fetchProducts(currentPage, currentQuery); // Pass the query to handle searching and filtering
+    }, [query, currentPage, filters, sortOption]);
+     
+  
+    const fetchProducts = async (page, query = "") => {
         setLoading(true);
         try {
+            const safeQuery = query || ""; // Ensure query is a string
             const queryParams = new URLSearchParams({
                 page,
                 limit,
                 sort: sortOption.field,
                 order: sortOption.order,
-                ...filters,
+                ...filters, // Include filter options
+                query: safeQuery.trim(), // Safely trim the query
             }).toString();
-
+    
+            const endpoint = safeQuery ? "search" : "filter"; // Decide endpoint based on query presence
             const response = await fetch(
-                `http://localhost:5000/api/products/filter?${queryParams}`
+                `http://localhost:5000/api/products/${endpoint}?${queryParams}`
             );
+    
             if (!response.ok) {
                 throw new Error("Network response was not ok");
             }
+    
             const data = await response.json();
-
-            setProducts(data.products);
-            setTotalPages(data.totalPages);
+    
+            if (data.products) {
+                setProducts(data.products);
+                setTotalPages(data.totalPages || 1); // Adjust for pagination
+            } else {
+                // Handle cases where data is directly returned as an array (e.g., search results)
+                setProducts(data);
+                setTotalPages(Math.ceil((data.length || 0) / limit)); // Adjust pagination
+            }
         } catch (error) {
             console.error("Error fetching products:", error);
         }
         setLoading(false);
-    };
+    };      
 
     const handlePageChange = (page) => {
         if (page >= 1 && page <= totalPages) {
@@ -119,9 +132,7 @@ function ShoppingHome() {
         const [field, order] = e.target.value.split("-");
         setSortOption({ field, order });
         setCurrentPage(1); // Reset to the first page when sort option changes
-    };
-   
-   
+    }; 
    
     const handleAddToCart = async (productId, quantityInStock) => {
         try {
@@ -200,41 +211,6 @@ function ShoppingHome() {
                 variant: "destructive",
             });
         }
-    };
-
-
-    useEffect(() => {
-        if (query) {
-            fetchProductsByQuery(query);
-        }
-    }, [query, currentPage, filters, sortOption]);
-
-    const fetchProductsByQuery = async (query) => {
-        setLoading(true);
-        try {
-            const queryParams = new URLSearchParams({
-                page: currentPage,
-                limit,
-                sort: sortOption.field,
-                order: sortOption.order,
-                ...filters,
-                query: query, // Include the search query in the params
-            }).toString();
-
-            const response = await fetch(
-                `http://localhost:5000/api/products/search?${queryParams}`
-            );
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            const data = await response.json();
-
-            setProducts(data);
-            setTotalPages(Math.ceil(data.length / limit)); // Adjust this if necessary for pagination
-        } catch (error) {
-            console.error("Error fetching products:", error);
-        }
-        setLoading(false);
     };
     
     return (
