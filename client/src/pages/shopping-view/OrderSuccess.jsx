@@ -109,12 +109,12 @@ function OrderSuccess() {
                     {item.image && (
                       <img
                         src={`/product-images/${item.image}`}
-                        alt={item.title}
+                        alt={item.name}
                         className="w-16 h-16 object-cover rounded mr-4"
                       />
                     )}
                     <div className="flex-1">
-                      <p className="font-medium">{item.title}</p>
+                      <p className="font-medium">{item.name}</p>
                       <p className="text-sm text-gray-600">
                         Quantity: {item.quantity}
                       </p>

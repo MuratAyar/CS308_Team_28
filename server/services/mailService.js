@@ -85,7 +85,7 @@ async function sendInvoiceEmail(to, order) {
   doc.text('Ordered Items:', { underline: true });
   order.cartItems.forEach((item, index) => {
       doc.text(
-          `${index + 1}. ${item.title} - $${item.price} each, Sale Price: $${item.salePrice}`,
+          `${index + 1}. ${item.name} - $${item.price} each, Sale Price: $${item.salePrice}`,
           { align: 'left' }
       );
   });
