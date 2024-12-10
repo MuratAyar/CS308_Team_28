@@ -10,6 +10,7 @@ const shopAddressRouter = require("./routes/shop/address-route")
 // const shopProductsRouter = require("./routes/shop/products-routes");
 const shopCartRouter = require("./routes/shop/cart-routes");
 const shopOrderRouter = require("./routes/shop/order-routes");
+const userRoutes = require('./routes/user-routes');
 
 require('dotenv').config();
 
@@ -45,6 +46,7 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 app.use('/api/auth', authRouter);
+app.use('/api', userRoutes);
 app.use('/api/products', productRoutes); 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
