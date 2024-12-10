@@ -215,5 +215,20 @@ const getAllOrdersByUser = async (req, res) => {
       });
     }
   };
-
-module.exports = { createOrder, changeOrderStatus, getPendingOrders, getDeliveredOrders, getAllOrdersByUser, getOrderDetails};
+  const viewAllOrders = async (req, res) => {
+    try {
+      const orders = await Order.find(); // Retrieves all orders as-is from the database
+      res.status(200).json({
+        success: true,
+        message: "Orders retrieved successfully",
+        data: orders,
+      });
+    } catch (error) {
+      console.error("Error retrieving orders:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to retrieve orders",
+      });
+    }
+  };
+module.exports = { createOrder, changeOrderStatus, getPendingOrders, getDeliveredOrders, getAllOrdersByUser, getOrderDetails, viewAllOrders};
