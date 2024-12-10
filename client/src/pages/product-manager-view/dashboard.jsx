@@ -1,7 +1,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserCog } from "lucide-react";
 import Address from "@/components/shopping-view/address";
+import ManageSearchOrders from "@/components/product-manager-view/searchOrders";
 import PendingComments from "@/components/product-manager-view/pending-comments";
+import ManageOrders from "@/components/product-manager-view/orders";
 import { useNavigate } from "react-router-dom"; // Added to enable navigation
 import { useSelector } from "react-redux"; // Added to access user info from Redux
 
@@ -25,6 +27,8 @@ function ShoppingAccount() {
               <TabsList>
                 <TabsTrigger value="comments">Pending Comments</TabsTrigger>
                 <TabsTrigger value="products">Products</TabsTrigger>
+                <TabsTrigger value="orders">All Orders</TabsTrigger>
+                <TabsTrigger value="Search Orders">Search Orders</TabsTrigger>
               </TabsList>
               <TabsContent value="comments">
                 <PendingComments />
@@ -32,6 +36,13 @@ function ShoppingAccount() {
               <TabsContent value="products">
                 {/* <Products /> */}
               </TabsContent>
+              <TabsContent value="orders">
+                <ManageOrders/>
+              </TabsContent>
+              <TabsContent value="Search Orders">
+                <ManageSearchOrders/>
+              </TabsContent>
+              
             </Tabs>
           </div>
         </div>
