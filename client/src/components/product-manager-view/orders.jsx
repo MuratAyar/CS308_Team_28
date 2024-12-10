@@ -6,6 +6,7 @@ const ManageOrders = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Fetch orders when component mounts
   useEffect(() => {
     const fetchOrders = async () => {
       const token = localStorage.getItem("authToken");
@@ -37,6 +38,38 @@ const ManageOrders = () => {
     fetchOrders();
   }, []);
 
+  // Handle status change
+  const handleStatusChange = async (orderId, newStatus) => {
+    const token = localStorage.getItem("authToken");
+
+    if (!token) {
+      setError("Authentication required. Please log in again.");
+      return;
+    }
+
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/api/shop/order/update-order-status/${orderId}`,
+        { orderStatus: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        // Update the order status in the UI
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order._id === orderId ? { ...order, orderStatus: newStatus } : order
+          )
+        );
+
+      } else {
+        setError("Failed to update order status.");
+      }
+    } catch (err) {
+      setError("Error updating order status.");
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -61,6 +94,17 @@ const ManageOrders = () => {
             </div>
             <div>
               <strong>Status:</strong> {order.orderStatus}
+              <select
+                value={order.orderStatus}
+                onChange={(e) =>
+                  handleStatusChange(order._id, e.target.value)
+                }
+                className="ml-2 border rounded p-1"
+              >
+                <option value="processing">Processing</option>
+                <option value="in-transit">In Transit</option>
+                <option value="delivered">Delivered</option>
+              </select>
             </div>
             <div>
               <strong>Order Date:</strong>{" "}
