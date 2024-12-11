@@ -1,11 +1,13 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserCog } from "lucide-react";
-import Address from "@/components/shopping-view/address";
+
 import ManageSearchOrders from "@/components/product-manager-view/searchOrders";
 import PendingComments from "@/components/product-manager-view/pending-comments";
 import ManageOrders from "@/components/product-manager-view/orders";
+
 import { useNavigate } from "react-router-dom"; // Added to enable navigation
 import { useSelector } from "react-redux"; // Added to access user info from Redux
+import ProductListing from "@/components/product-manager-view/createProduct";
 
 function ShoppingAccount() {
   const user = useSelector((state) => state.auth.user); // Access user data from Redux
@@ -15,6 +17,7 @@ function ShoppingAccount() {
       // Navigate to the confirm-delete page with user info
       navigate("/shop/account/confirm-delete", { state: { user } });
   };
+  
 
     return (
       <div className="flex flex-col items-center justify-center min-h-screen"> {/* Centers content vertically and horizontally */}
@@ -34,7 +37,7 @@ function ShoppingAccount() {
                 <PendingComments />
               </TabsContent>
               <TabsContent value="products">
-                {/* <Products /> */}
+                <ProductListing/>
               </TabsContent>
               <TabsContent value="orders">
                 <ManageOrders/>
