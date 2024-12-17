@@ -40,11 +40,12 @@ const ProductListing = () => {
         {/* Mapping through the products and displaying them */}
         {products.map((product) => (
           <div key={product._id} className="bg-white p-4 rounded-lg shadow-lg w-60 text-center transition-transform transform hover:scale-105 hover:shadow-xl">
-            <img src={product.image} alt={product.name} className="w-full h-auto rounded-lg object-cover" />
+            <img src={`/product-images/${product.image}`} alt={product.name} className="w-full h-auto rounded-lg object-cover" />
             <h2 className="text-lg font-bold text-gray-800 mt-3">{product.name}</h2>
             <p className="text-sm text-gray-600 my-2 h-16 overflow-hidden text-ellipsis">{product.description}</p>
-            <span className="block text-gray-800 font-semibold">{product.price}</span>
-            <span className="block text-gray-500">{product.rating}</span>
+            <span className="block text-gray-800 font-semibold">Price: ${product.price}</span>
+            <span className="block text-gray-500">Quantity: {product.quantityInStock}</span>
+            <span className="block text-gray-500">Rating: {product.rating}/5</span>
             {/* Delete button */}
             <button 
               onClick={() => handleDelete(product._id)} 

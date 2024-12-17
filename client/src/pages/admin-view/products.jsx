@@ -42,10 +42,12 @@ const AdminProducts = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {products.map((product) => (
           <div key={product._id} className="p-4 border rounded shadow-md">
-            <img src={product.image} alt={product.name} className="w-full h-32 object-cover" />
+            <img src={`/product-images/${product.image}`} alt={product.name} className="w-full h-32 object-cover" />
             <h3 className="font-bold mt-2">{product.name}</h3>
             <p>{product.description}</p>
             <p className="text-gray-700 font-semibold">Price: ${product.price}</p>
+            <p className="text-gray-700 font-semibold">Quantity: {product.quantityInStock}</p>
+            <p className="text-gray-700 font-semibold">Rating: {product.rating}/5</p>
             <button
               onClick={() => handleDelete(product._id)}
               className="mt-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
