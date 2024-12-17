@@ -56,7 +56,7 @@ function ShoppingOrderDetailsView({ orderDetails }) {
               {orderDetails?.cartItems && orderDetails?.cartItems.length > 0
                 ? orderDetails?.cartItems.map((item) => (
                     <li className="flex items-center justify-between">
-                      <span>Title: {item.name}</span>
+                      <span>Name: {item.name}</span>
                       <span>Quantity: {item.quantity}</span>
                       <span>Price: ${item.price}</span>
                     </li>
