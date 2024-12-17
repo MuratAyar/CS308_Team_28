@@ -19,7 +19,7 @@ const authenticateToken = (req, res, next) => {
     });
 };
 // Middleware to authenticate and authorize users based on their roles
-const authorizeRole = (requiredRole) => {
+const authorizeRole = (...allowedRoles) => {
     return (req, res, next) => {
         const token = req.header('Authorization')?.split(' ')[1];
 
@@ -28,14 +28,15 @@ const authorizeRole = (requiredRole) => {
         }
 
         try {
-            const decoded = jwt.verify(token, 'CLIENT_SECRET_KEY');
+            const decoded = jwt.verify(token, 'CLIENT_SECRET_KEY'); // Replace with your actual secret key
             req.user = decoded;
 
-            if (req.user.role !== requiredRole) {
+            // Check if user's role is in the allowed roles array
+            if (!allowedRoles.includes(req.user.role)) {
                 return res.status(403).json({ error: 'Access denied. You do not have the required role.' });
             }
-            console.log('Access given');
             
+            console.log('Access given to role:', req.user.role);
             next();
         } catch (error) {
             console.error('Authorization error:', error);

@@ -29,7 +29,7 @@ const Users = () => {
 
     return (
         <div className="admin-dashboard">
-            <h2>Admin Dashboard - Manage Users</h2>
+            <h2 className="text-2xl font-bold mb-4">Manage Users</h2>
             <div className="table-container">
                 <table className="users-table">
                     <thead>
