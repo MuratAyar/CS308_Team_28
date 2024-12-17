@@ -231,4 +231,104 @@ const getAllOrdersByUser = async (req, res) => {
       });
     }
   };
-module.exports = { createOrder, changeOrderStatus, getPendingOrders, getDeliveredOrders, getAllOrdersByUser, getOrderDetails, viewAllOrders};
+
+  const calculateRevenueAndLoss = async (req, res) => {
+    try {
+      // Extract 'startDate' and 'endDate' from the query parameters
+      const { startDate, endDate } = req.query;
+  
+      if (!startDate || !endDate) {
+        return res.status(400).json({ message: "Both 'startDate' and 'endDate' are required." });
+      }
+  
+      // Parse and format dates
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+  
+      // Fetch all orders within the date range
+      const orders = await Order.find({
+        orderDate: {
+          $gte: start,
+          $lte: end,
+        },
+      });
+  
+      // Initialize counters
+      let totalRevenue = 0;
+      let totalLoss = 0;
+      const revenueBreakdown = {};
+      const lossBreakdown = {};
+  
+      // Process each order to calculate revenue and loss
+      orders.forEach(order => {
+        order.cartItems.forEach(item => {
+          const quantity = item.quantity || 1;
+          const productKey = item.title || item.productId; // Use title if available, otherwise productId
+  
+          // Calculate revenue: original sale price or salePrice
+          const revenue = item.salePrice 
+            ? parseFloat(item.salePrice) * quantity 
+            : parseFloat(item.price) * quantity;
+  
+          // Add to total revenue
+          totalRevenue += revenue;
+  
+          // Add to revenue breakdown
+          if (revenueBreakdown[productKey]) {
+            revenueBreakdown[productKey] += revenue;
+          } else {
+            revenueBreakdown[productKey] = revenue;
+          }
+  
+          // Calculate loss if salePrice exists
+          if (item.salePrice) {
+            const originalPrice = parseFloat(item.price) * quantity;
+            const salePrice = parseFloat(item.salePrice) * quantity;
+  
+            const loss = originalPrice - salePrice;
+  
+            // Add to total loss
+            totalLoss += loss;
+  
+            // Add to loss breakdown
+            if (lossBreakdown[productKey]) {
+              lossBreakdown[productKey] += loss;
+            } else {
+              lossBreakdown[productKey] = loss;
+            }
+          }
+        });
+      });
+  
+      // Format revenue and loss breakdown for response
+      const formattedRevenueBreakdown = Object.entries(revenueBreakdown).map(([product, amount]) => ({
+        product,
+        revenue: amount.toFixed(2),
+      }));
+  
+      const formattedLossBreakdown = Object.entries(lossBreakdown).map(([product, amount]) => ({
+        product,
+        loss: amount.toFixed(2),
+      }));
+  
+      // Response with all the aggregated data
+      return res.status(200).json({
+        success: true,
+        totalRevenue: totalRevenue.toFixed(2),
+        totalLoss: totalLoss.toFixed(2),
+        startDate: startDate,
+        endDate: endDate,
+        ordersCount: orders.length,
+        revenueBreakdown: formattedRevenueBreakdown,
+        lossBreakdown: formattedLossBreakdown,
+      });
+    } catch (error) {
+      console.error("Error calculating revenue and loss:", error.message);
+      return res.status(500).json({ message: "Internal server error." });
+    }
+  };
+  
+
+module.exports = { createOrder, changeOrderStatus, getPendingOrders, getDeliveredOrders, getAllOrdersByUser, 
+  getOrderDetails, viewAllOrders, calculateRevenueAndLoss};

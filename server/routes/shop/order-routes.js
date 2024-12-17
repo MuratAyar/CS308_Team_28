@@ -1,5 +1,6 @@
 const express = require("express");
-const { createOrder, changeOrderStatus, getPendingOrders, getDeliveredOrders, getAllOrdersByUser, getOrderDetails, viewAllOrders} = require("../../controllers/shop/order-controller");
+const { createOrder, changeOrderStatus, getPendingOrders, getDeliveredOrders, getAllOrdersByUser, 
+    getOrderDetails, viewAllOrders, calculateRevenueAndLoss} = require("../../controllers/shop/order-controller");
 const {authenticateToken, authorizeRole} = require('../../middleware/index')
 const router = express.Router();
 
@@ -12,4 +13,5 @@ router.put('/update-order-status/:orderId', authenticateToken, authorizeRole('pr
 router.get('/pending-orders', authenticateToken, authorizeRole('product', 'admin'), getPendingOrders)
 router.get('/products-to-deliver', authenticateToken, authorizeRole('product', 'admin'), getDeliveredOrders)
 router.get("/allOrders", authenticateToken, authorizeRole('product', 'admin'), viewAllOrders)
+router.get("/revenueAndLoss", authenticateToken, authorizeRole('sales', 'admin'), calculateRevenueAndLoss)
 module.exports = router;
