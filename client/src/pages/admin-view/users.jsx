@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchUsers } from "../../store/user-slice"; // Adjust the path based on your project structure
+import { fetchUsers, updateUserRole } from "../../store/user-slice"; // Adjust the path based on your project structure
+import axios from "axios";
 import "./Users.css"; // Add a CSS file for styling
 
 const Users = () => {
@@ -12,8 +13,29 @@ const Users = () => {
     }, [dispatch]);
 
     const handleRoleChange = async (userId, newRole) => {
-        // Implement role change functionality here
-        console.log(`Change role for user ${userId} to ${newRole}`);
+        try {
+            // Make the API call to update the role
+            const token = localStorage.getItem("authToken"); // Retrieve token for authentication
+            const response = await axios.put(
+                `http://localhost:5000/api/users/${userId}/role`,
+                { role: newRole },
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+
+            if (response.data.success) {
+                console.log("Role updated successfully:", response.data.data);
+                // Dispatch an action to update the role in the Redux store
+                dispatch(updateUserRole({ userId, newRole }));
+            } else {
+                console.error("Failed to update role:", response.data.message);
+                alert("Failed to update role.");
+            }
+        } catch (err) {
+            console.error("Error updating role:", err);
+            alert("An error occurred while updating the role.");
+        }
     };
 
     if (isLoading)
