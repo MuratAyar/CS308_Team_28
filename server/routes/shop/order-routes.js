@@ -1,6 +1,6 @@
 const express = require("express");
 const { createOrder, changeOrderStatus, getPendingOrders, getDeliveredOrders, getAllOrdersByUser, 
-    getOrderDetails, viewAllOrders, calculateRevenueAndLoss} = require("../../controllers/shop/order-controller");
+    getOrderDetails, viewAllOrders, calculateRevenueAndLoss, applyOrderDiscounts,undoOrderDiscounts} = require("../../controllers/shop/order-controller");
 const {authenticateToken, authorizeRole} = require('../../middleware/index')
 const router = express.Router();
 
@@ -14,4 +14,9 @@ router.get('/pending-orders', authenticateToken, authorizeRole('product', 'admin
 router.get('/products-to-deliver', authenticateToken, authorizeRole('product', 'admin'), getDeliveredOrders)
 router.get("/allOrders", authenticateToken, authorizeRole('product', 'admin'), viewAllOrders)
 router.get("/revenueAndLoss", authenticateToken, authorizeRole('sales', 'admin'), calculateRevenueAndLoss)
+router.put('/discount', authenticateToken, authorizeRole('sales'), applyOrderDiscounts)
+router.put('/undo-discount', authenticateToken, authorizeRole('sales'), undoOrderDiscounts)
+
+
+
 module.exports = router;
