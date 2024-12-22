@@ -591,7 +591,6 @@ const undoDiscount = async (req, res) => {
     }
 };
 
-
   module.exports = {getFilteredProducts, getFilterOptions, searchProducts, deleteProduct, updateStock, 
     getAllProducts, getIds, addProduct, filterProducts, addComment, addRating, getCommentsByProduct, 
     getProductDetails, updateCommentApproval, getPendingComments, setProductPrice, applyDiscount, undoDiscount}
