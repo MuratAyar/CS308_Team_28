@@ -4,6 +4,7 @@ const Product = require('../../models/Product');
 const Comment = require('../../models/Comment');
 const {authorizeRole, authenticateToken} = require('../../middleware/index')
 const mongoose = require('mongoose')
+const { sendDiscountNotificationEmail } = require("../../services/mailService"); // Import mail service
 
 const getFilteredProducts = async (req, res) => {
   try {
@@ -554,6 +555,15 @@ const applyDiscount = async (req, res) => {
             message: 'Discount applied successfully.',
             product,
         });
+        
+        // Send discount notification email
+        const trialEmail = "ayar.murat555@gmail.com"; // Trial user email
+        try {
+            await sendDiscountNotificationEmail(trialEmail, product, discountRate);
+        } catch (emailError) {
+            console.error("Error sending discount notification email:", emailError);
+        }
+
     } catch (error) {
         console.error('Error applying discount:', error);
         res.status(500).json({ error: 'Server error' });

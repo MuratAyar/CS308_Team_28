@@ -11,6 +11,7 @@ const shopAddressRouter = require("./routes/shop/address-route")
 const shopCartRouter = require("./routes/shop/cart-routes");
 const shopOrderRouter = require("./routes/shop/order-routes");
 const userRoutes = require('./routes/user-routes');
+const invoiceRoutes = require('./routes/invoice-routes');
 
 require('dotenv').config();
 
@@ -55,5 +56,8 @@ app.use('/api/shop/products', productRoutes);
 app.use('/api/shop/cart', shopCartRouter);
 app.use("/api/shop/order", shopOrderRouter);
 app.use('/api/products', productRoutes);
+app.use('/api', invoiceRoutes);
+app.use('/invoices', express.static(path.join(__dirname, 'invoices')));
+
 module.exports = app;
 app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));

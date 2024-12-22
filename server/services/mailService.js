@@ -135,4 +135,33 @@ async function sendInvoiceEmail(to, order) {
   }
 }
 
-module.exports = { sendWelcomeEmail, sendFeedbackEmail, sendInvoiceEmail };
+async function sendDiscountNotificationEmail(to, product, discountRate) {
+  const emailSubject = "Discount Applied Notification";
+  const emailBody = `
+      <h1>Discount Applied!</h1>
+      <p>A discount of <strong>${discountRate}%</strong> has been successfully applied to the product:</p>
+      <ul>
+          <li><strong>Product Name:</strong> ${product.name}</li>
+          <li><strong>Original Price:</strong> $${product.price.toFixed(2)}</li>
+          <li><strong>New Sale Price:</strong> $${product.salesPrice.toFixed(2)}</li>
+      </ul>
+      <p>Check out our other discounted products!</p>
+  `;
+
+  const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: to,
+      subject: emailSubject,
+      html: emailBody,
+  };
+
+  try {
+      await transporter.sendMail(mailOptions);
+      console.log(`Discount notification email sent to ${to}`);
+  } catch (error) {
+      console.error("Error sending discount notification email:", error);
+      throw error;
+  }
+}
+
+module.exports = { sendWelcomeEmail, sendFeedbackEmail, sendInvoiceEmail, sendDiscountNotificationEmail };
