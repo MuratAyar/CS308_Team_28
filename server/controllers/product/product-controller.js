@@ -489,6 +489,44 @@ const getPendingComments = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error. Unable to fetch pending comments.' });
     }
 };
+
+
+const setProductPrice = async (req, res) => {
+    const { productId } = req.params;
+    const { price } = req.body;
+
+    if (price == null || price < 0) {
+        return res.status(400).json({ error: 'Invalid price value. Price must be a positive number.' });
+    }
+
+    try {
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+            return res.status(400).json({ message: 'Invalid product ID.' });
+        }
+
+        const product = await Product.findByIdAndUpdate(
+            productId,
+            { price },
+            { new: true, runValidators: true }
+        );
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found.' });
+        }
+
+        res.status(200).json({
+            message: 'Product price updated successfully.',
+            product: {
+                id: product._id,
+                name: product.name,
+                price: product.price,
+            },
+        });
+    } catch (error) {
+        console.error('Error updating product price:', error);
+        res.status(500).json({ message: 'Server error. Unable to update product price.' });
+    }
+};
 const applyDiscount = async (req, res) => {
     const { productId, discountRate } = req.body;
 
@@ -556,4 +594,4 @@ const undoDiscount = async (req, res) => {
 
   module.exports = {getFilteredProducts, getFilterOptions, searchProducts, deleteProduct, updateStock, 
     getAllProducts, getIds, addProduct, filterProducts, addComment, addRating, getCommentsByProduct, 
-    getProductDetails, updateCommentApproval, getPendingComments, applyDiscount, undoDiscount}
+    getProductDetails, updateCommentApproval, getPendingComments, setProductPrice, applyDiscount, undoDiscount}
