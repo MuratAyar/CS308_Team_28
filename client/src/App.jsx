@@ -24,8 +24,10 @@ import AccountDeleted from "./pages/shopping-view/AccountDeleted";
 import OrderSuccess from "./pages/shopping-view/OrderSuccess";
 
 import ProductManagerLayout from "./components/product-manager-view/layout";
-import DashboardPage from "./pages/product-manager-view/dashboard";
+import ProductManagerAccount from "./pages/product-manager-view/dashboard";
 
+import SalesManagerLayout from "./components/sales-manager-view/layout";
+import SalesManagerAccount from "./pages/sales-manager-view/dashboard";
 
 function App() {
   const {user, isAuthenticated} = useSelector((state)=> state.auth)
@@ -81,7 +83,11 @@ function App() {
         <Route path="*" element={<NotFound/>}/>
 
         <Route path="/pmanager" element={<ProductManagerLayout />}>
-          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="dashboard" element={<ProductManagerAccount />} />
+        </Route>
+
+        <Route path="/smanager" element={<SalesManagerLayout />}>
+          <Route path="dashboard" element={<SalesManagerAccount />} />
         </Route>
 
       </Routes>
