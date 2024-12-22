@@ -489,7 +489,71 @@ const getPendingComments = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error. Unable to fetch pending comments.' });
     }
 };
+const applyDiscount = async (req, res) => {
+    const { productId, discountRate } = req.body;
+
+    // Validate inputs
+    if (!productId) {
+        return res.status(400).json({ error: 'Product ID is required.' });
+    }
+    if (discountRate == null || discountRate <= 0 || discountRate > 100) {
+        return res.status(400).json({ error: 'Discount rate must be a valid percentage (1-100).' });
+    }
+
+    try {
+        // Find the product
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ error: 'Product not found.' });
+        }
+
+        // Apply discount
+        product.salesPrice = parseFloat((product.price * (1.00 - discountRate / 100.00)).toFixed(2));
+      
+        await product.save();
+
+        res.status(200).json({
+            message: 'Discount applied successfully.',
+            product,
+        });
+    } catch (error) {
+        console.error('Error applying discount:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+const undoDiscount = async (req, res) => {
+    const { productId } = req.body;
+
+    // Validate inputs
+    if (!productId) {
+        return res.status(400).json({ error: 'Product ID is required.' });
+    }
+
+    try {
+        // Find the product
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ error: 'Product not found.' });
+        }
+
+        if (product.salesPrice !== null) {
+            product.salesPrice = null; 
+        }
+
+        await product.save();
+
+        res.status(200).json({
+            message: 'Discount undone successfully.',
+            product,
+        });
+    } catch (error) {
+        console.error('Error undoing discount:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
 
   module.exports = {getFilteredProducts, getFilterOptions, searchProducts, deleteProduct, updateStock, 
     getAllProducts, getIds, addProduct, filterProducts, addComment, addRating, getCommentsByProduct, 
-    getProductDetails, updateCommentApproval, getPendingComments}
+    getProductDetails, updateCommentApproval, getPendingComments, applyDiscount, undoDiscount}

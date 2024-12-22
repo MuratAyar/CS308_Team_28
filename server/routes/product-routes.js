@@ -5,7 +5,7 @@ const Comment = require('../models/Comment')
 const {authorizeRole, authenticateToken} = require('../middleware/index')
 const {getFilterOptions, searchProducts, updateStock, getAllProducts, filterProducts, 
   addProduct, getIds, deleteProduct, addRating, addComment, getCommentsByProduct, 
-  getProductDetails, updateCommentApproval, getPendingComments} = require('../controllers/product/product-controller')
+  getProductDetails, updateCommentApproval, getPendingComments, applyDiscount,undoDiscount} = require('../controllers/product/product-controller')
 
 router.get('/filters', getFilterOptions);
 router.get('/:productId/details', getProductDetails);
@@ -30,5 +30,8 @@ router.get('/:productId/comments', getCommentsByProduct);
 //for product manager: getting and updating the pending comments
 router.put('/:commentId/update-approval', authenticateToken, authorizeRole('product'), updateCommentApproval);
 router.get('/pendingcomments', authenticateToken, authorizeRole('product'), getPendingComments); 
+router.put('/discount', authenticateToken, authorizeRole('sales'), applyDiscount);
+router.put('/undo-discount', authenticateToken, authorizeRole('sales'), undoDiscount);
+
 
   module.exports = router;

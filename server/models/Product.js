@@ -7,6 +7,7 @@ const productSchema = new mongoose.Schema({
     description: { type: String },
     quantityInStock: { type: Number, required: true },
     price: { type: Number, required: true },
+    salesPrice: { type: Number, default: 0 }, // New attribute for discounted price
     warrantyStatus: { type: Boolean },
     distributor: { type: String },
     popularity: { type: Number, default: 0 },
