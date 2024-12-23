@@ -37,6 +37,9 @@ function CheckAuth({ isAuthenticated, user, children }) {
         else if(user?.role === "product"){
           return <Navigate to="/pmanager/dashboard" />;
         }
+        else if(user?.role === "sales"){
+          return <Navigate to="/smanager/dashboard" />;
+        }
         else {
           return <Navigate to="/shop/home" />;
         }
