@@ -93,42 +93,44 @@ const searchProducts = async (req, res) => {
 };
 
 const getAllProducts = async (req, res) => {
-    const { sort, order = 'asc', page = 1, limit = 10 } = req.query;
+    const { sort, order = 'asc', page = 1, limit } = req.query;
 
+    // Default sort options
     let sortOptions = {};
-    if (sort === 'price') {
-        sortOptions.price = order === 'desc' ? -1 : 1;
-    } else if (sort === 'popularity') {
-        sortOptions.popularity = order === 'desc' ? -1 : 1;
+    if (sort) {
+        sortOptions[sort] = order === 'desc' ? -1 : 1; // Dynamically set the sort field and order
     }
 
-    const pageNumber = parseInt(page) || 1;
-    const limitNumber = parseInt(limit) || 10;
+    // Parse page and limit, with default values
+    const pageNumber = parseInt(page, 10) || 1;
+    const limitNumber = parseInt(limit, 10) || 0; // 0 means no limit (fetch all)
 
     try {
         // Calculate total products for pagination
         const totalProducts = await Product.countDocuments();
 
-        // Calculate the total pages
-        const totalPages = Math.ceil(totalProducts / limitNumber);
+        // Calculate total pages if limit is specified
+        const totalPages = limitNumber > 0 ? Math.ceil(totalProducts / limitNumber) : 1;
 
-        // Fetch all products with sorting and pagination
+        // Fetch products with sorting and pagination
         const products = await Product.find({})
             .sort(sortOptions)
-            .limit(limitNumber)
-            .skip((pageNumber - 1) * limitNumber);
+            .skip(limitNumber > 0 ? (pageNumber - 1) * limitNumber : 0) // Skip only if limit is applied
+            .limit(limitNumber > 0 ? limitNumber : totalProducts); // Limit only if specified
 
         res.json({
+            success: true,
             totalProducts,
             totalPages,
             currentPage: pageNumber,
-            products
+            products,
         });
     } catch (error) {
         console.error('Error fetching and sorting products:', error);
         res.status(500).json({ error: 'Could not fetch products.' });
     }
-}
+};
+
 const filterProducts = async (req, res) => {
   const { category, brand, minPrice, maxPrice, inStock, rating, gender, page = 1, limit = 10, sort, order = 'asc' } = req.query;
 
