@@ -153,7 +153,7 @@ function SalesManagerDiscount() {
                           variant="destructive"
                           onClick={() => handleUndoDiscount(product._id)}
                           disabled={isLoading}
-                          className="bg-rose-800 rose:bg-gray-800 text-rose-50"
+                          className="bg-rose-800 hover:bg-rose-800 text-gray-50"
                         >
                           Undo Discount
                         </Button>
