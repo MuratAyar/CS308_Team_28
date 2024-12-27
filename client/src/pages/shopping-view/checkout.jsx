@@ -28,8 +28,8 @@ function ShoppingCheckout() {
       ? cartItems.items.reduce(
           (sum, currentItem) =>
             sum +
-            (currentItem?.salePrice > 0
-              ? currentItem?.salePrice
+            (currentItem?.salesPrice > 0
+              ? currentItem?.salesPrice
               : currentItem?.price) *
               currentItem?.quantity,
           0
