@@ -2,6 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserPen } from "lucide-react";
 import ViewInvoices from "@/components/sales-manager-view/ViewInvoices";
 import SetPrices from "@/pages/sales-manager-view/SetPrices";
+import CalculateRevenueLoss from "@/components/sales-manager-view/revenueloss";
 import { useNavigate } from "react-router-dom"; // Added to enable navigation
 import { useSelector } from "react-redux"; // Added to access user info from Redux
 
@@ -32,7 +33,7 @@ function SalesManagerAccount() {
                 <ViewInvoices />
               </TabsContent>
               <TabsContent value="Search Orders">
-                {/*<Calculate Revenue/Loss/>*/}
+                <CalculateRevenueLoss/>
               </TabsContent>
               
             </Tabs>
