@@ -71,7 +71,7 @@ const fetchCartItems = async (req,res)=>{
 
         const cart = await Cart.findOne({userId}).populate({
             path: "items.productId",
-            select: "name image price salePrice quantityInStock",
+            select: "name image price salesPrice quantityInStock",
         });
 
         if(!cart){
@@ -89,7 +89,7 @@ const fetchCartItems = async (req,res)=>{
         }
         // Calculate total cost by summing up each item's (price or salePrice) * quantity
         const totalCost = validItems.reduce((total, item) => {
-            const price = item.productId.salePrice || item.productId.price;
+            const price = item.productId.salesPrice || item.productId.price;
             return total + price * item.quantity;
         }, 0);
 
@@ -98,7 +98,7 @@ const fetchCartItems = async (req,res)=>{
             name: item.productId.name, // Include the name
             image: item.productId.image,
             price: item.productId.price,
-            salePrice: item.productId.salePrice,
+            salesPrice: item.productId.salesPrice,
             quantity: item.quantity,
             quantityInStock: item.productId.quantityInStock,
 
@@ -159,7 +159,7 @@ const updateCartItemQty = async (req, res) => {
 
         await cart.populate({
             path: "items.productId",
-            select: "name image price salePrice quantityInStock",
+            select: "name image price salesPrice quantityInStock",
         });
 
         const populateCartItems = cart.items.map((item) => ({
@@ -167,7 +167,7 @@ const updateCartItemQty = async (req, res) => {
             image: item.productId ? item.productId.image : null,
             name: item.productId ? item.productId.name : "Product not found!",
             price: item.productId ? item.productId.price : null,
-            salePrice: item.productId ? item.productId.salePrice : null,
+            salesPrice: item.productId ? item.productId.salesPrice : null,
             quantity: item.quantity,
             quantityInStock: item.productId.quantityInStock,
             
@@ -208,7 +208,7 @@ const deleteCartItem = async (req, res) => {
 
         const cart = await Cart.findOne({ userId }).populate({
             path: "items.productId",
-            select: "name image price salePrice",
+            select: "name image price salesPrice",
         });
 
         if (!cart) {
@@ -238,7 +238,7 @@ const deleteCartItem = async (req, res) => {
             image: item.productId ? item.productId.image : null,
             name: item.productId ? item.productId.name : "Product not found",
             price: item.productId ? item.productId.price : null,
-            salePrice: item.productId ? item.productId.salePrice : null,
+            salesPrice: item.productId ? item.productId.salesPrice : null,
             quantity: item.quantity,
         }));
 

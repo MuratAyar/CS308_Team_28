@@ -366,7 +366,19 @@ function ShoppingHome() {
                                             onClick={() => handleProductClick(product)}
                                         />
                                         <h3 className="font-bold text-lg mb-2">{product.name}</h3>
-                                        <p className="mb-1"><strong>${product.price} </strong></p>
+                                        <p className="mb-1">
+                                        <strong>
+                                            {product.salesPrice ? (
+                                            <>
+                                                <span className="line-through text-gray-500">${product.price}</span> {/* Original price */}
+                                                <span className="text-red-500 ml-2">${product.salesPrice}</span> {/* Discounted price */}
+                                            </>
+                                            ) : (
+                                            <span>${product.price}</span> /* Regular price */
+                                            )}
+                                        </strong>
+                                        </p>
+
                                         <p className="mb-1"><strong>{product.brand}</strong></p>
                                         <p className="mb-2">{product.description}</p>
 

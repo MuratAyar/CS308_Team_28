@@ -5,6 +5,7 @@ import SetPrices from "@/pages/sales-manager-view/SetPrices";
 import CalculateRevenueLoss from "@/components/sales-manager-view/revenueloss";
 import { useNavigate } from "react-router-dom"; // Added to enable navigation
 import { useSelector } from "react-redux"; // Added to access user info from Redux
+import SalesManagerDiscount from "@/pages/sales-manager-view/SalesManagerDiscount";
 
 function SalesManagerAccount() {
   const user = useSelector((state) => state.auth.user); // Access user data from Redux
@@ -27,7 +28,7 @@ function SalesManagerAccount() {
                 {<SetPrices />}
               </TabsContent>
               <TabsContent value="products">
-                {/*<Apply Discounts/>*/}
+                {<SalesManagerDiscount />}
               </TabsContent>
               <TabsContent value="orders">
                 <ViewInvoices />
