@@ -28,6 +28,7 @@ import ProductManagerAccount from "./pages/product-manager-view/dashboard";
 
 import SalesManagerLayout from "./components/sales-manager-view/layout";
 import SalesManagerAccount from "./pages/sales-manager-view/dashboard";
+import WishlistPage from "./components/shopping-view/WishlistPage";
 
 function App() {
   const {user, isAuthenticated} = useSelector((state)=> state.auth)
@@ -89,7 +90,7 @@ function App() {
         <Route path="/smanager" element={<SalesManagerLayout />}>
           <Route path="dashboard" element={<SalesManagerAccount />} />
         </Route>
-
+        <Route path="/wishlist" element={<WishlistPage />} />;
       </Routes>
     </div>
   )

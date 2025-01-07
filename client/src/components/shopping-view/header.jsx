@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { User, House, LogOut, Menu, ShoppingCart, UserCog, Search } from "lucide-react";
+import {Heart, User, House, LogOut, Menu, ShoppingCart, UserCog, Search } from "lucide-react";
 import {
   Link,
   useLocation,
@@ -60,6 +60,15 @@ function HeaderRightContent() {
 
   return (
     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
+      {/* Wishlist Icon */}
+      <Button
+        onClick={() => navigate("/wishlist")} // Navigate to the wishlist page
+        variant="outline"
+        size="icon"
+      >
+        <Heart className="w-6 h-6" />
+        <span className="sr-only">Wishlist</span>
+      </Button>
       {/* Shopping Cart Button: Always visible */}
       <Button
         onClick={() => setOpenCartSheet(true)}

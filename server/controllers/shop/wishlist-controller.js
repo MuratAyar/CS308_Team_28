@@ -60,11 +60,9 @@ const removeFromWishlist = async (req, res) => {
   }
 };
 
-// Fetch wishlist items
 const fetchWishlist = async (req, res) => {
   try {
-    const userId = req.user.id;
-
+    const userId = req.user.id; // Extract user ID from token
     const wishlist = await Wishlist.findOne({ userId }).populate({
       path: "items.productId",
       select: "name price salesPrice image quantityInStock",
@@ -74,21 +72,12 @@ const fetchWishlist = async (req, res) => {
       return res.status(404).json({ success: false, message: "Wishlist not found" });
     }
 
-    const wishlistItems = wishlist.items.map((item) => ({
-      productId: item.productId._id,
-      name: item.productId.name,
-      price: item.productId.price,
-      salesPrice: item.productId.salesPrice,
-      image: item.productId.image,
-      stockStatus: item.productId.quantityInStock > 0 ? "In Stock" : "Out of Stock",
-      addedOn: item.addedOn,
-    }));
-
-    res.status(200).json({ success: true, data: wishlistItems });
+    res.status(200).json({ success: true, data: wishlist.items });
   } catch (error) {
     console.error("Error fetching wishlist:", error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 module.exports = { addToWishlist, removeFromWishlist, fetchWishlist };
