@@ -6,6 +6,11 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import ProductDetails from "@/components/shopping-view/product-details";
 import { useSearchParams } from "react-router-dom";
+import { Heart } from "lucide-react";
+import axios from "axios";
+import {fetchWishlistItems,  removeWishlistItem, } from "@/store/shop/wishlist-slice";
+
+
 
 function ShoppingHome() {
     const [products, setProducts] = useState([]);
@@ -13,6 +18,9 @@ function ShoppingHome() {
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
     const limit = 12; // Number of products per page
+  
+    const { wishlistItems, isLoading } = useSelector((state) => state.wishlist);
+
     const [filters, setFilters] = useState({
         category: "",
         brand: "",
@@ -112,7 +120,57 @@ function ShoppingHome() {
             console.error("Error fetching products:", error);
         }
         setLoading(false);
-    };      
+    };     
+   
+    useEffect(() => {
+        dispatch(fetchWishlistItems());
+    }, [dispatch]);
+    
+    const handleWishlistToggle = async (productId) => {
+        try {
+            const isWishlisted = wishlistItems.some((item) => item.productId._id === productId);
+    
+            if (isWishlisted) {
+               
+                dispatch(removeWishlistItem(productId));
+                toast({
+                    title: "Product removed from wishlist!",
+                    description: "The product has been successfully removed from your wishlist.",
+                    
+                });
+            } else {
+               
+                await axios.post(
+                    "http://localhost:5000/api/wishlist/add",
+                    { productId },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+                        },
+                    }
+                );
+    
+               
+                dispatch(fetchWishlistItems());
+    
+                toast({
+                    title: "Product added to wishlist!",
+                    description: "You can check your wishlist to see all your favorite products.",
+                    
+                });
+            }
+        } catch (error) {
+            console.error("Error updating wishlist:", error);
+            toast({
+                title: "Error",
+                description: "Failed to update the wishlist. Please try again.",
+                variant: "destructive",
+            });
+        }
+    };
+    
+    
+    
 
     const handlePageChange = (page) => {
         if (page >= 1 && page <= totalPages) {
@@ -210,7 +268,8 @@ function ShoppingHome() {
                 description: "Something went wrong while adding the product to the cart.",
                 variant: "destructive",
             });
-        }
+        }    
+        
     };
     
     return (
@@ -339,17 +398,17 @@ function ShoppingHome() {
                             {query ? `All Products for "${query}"` : "All Products"}
                         </h2>
                         <div className="flex items-center gap-1 border border-gray-300 rounded px-2 py-1 bg-white w-40 text-sm">
-                        <ArrowUpDownIcon className="h-4 w-4" />
-                        <select
-                            value={`${sortOption.field}-${sortOption.order}`}
-                            onChange={handleSortChange}
-                            className="outline-none text-sm bg-white font-semibold"
-                        >
-                            <option value="">Sort by</option>
-                            <option value="price-asc">Price: Low to High</option>
-                            <option value="price-desc">Price: High to Low</option>
-                            <option value="popularity-desc">Popularity</option>
-                        </select>
+                            <ArrowUpDownIcon className="h-4 w-4" />
+                            <select
+                                value={`${sortOption.field}-${sortOption.order}`}
+                                onChange={handleSortChange}
+                                className="outline-none text-sm bg-white font-semibold"
+                            >
+                                <option value="">Sort by</option>
+                                <option value="price-asc">Price: Low to High</option>
+                                <option value="price-desc">Price: High to Low</option>
+                                <option value="popularity-desc">Popularity</option>
+                            </select>
                         </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
@@ -358,7 +417,29 @@ function ShoppingHome() {
                         ) : (
                             products.length > 0 ? (
                                 products.map((product) => (
-                                    <div key={product._id} className="border p-4 rounded-lg flex flex-col h-full">
+                                    <div key={product._id} className="border p-4 rounded-lg flex flex-col h-full relative">
+                                        {/* Heart Icon */}
+                                        <button
+                                            onClick={() => handleWishlistToggle(product._id)}
+                                            className="absolute top-2 right-2 z-10"
+                                            aria-label={
+                                                wishlistItems.some((item) => item.productId._id === product._id)
+                                                    ? "Remove from wishlist"
+                                                    : "Add to wishlist"
+                                            }
+                                            
+                                        >
+                                            <Heart
+                                                className={`w-6 h-6 transition-colors duration-200 ${
+                                                    wishlistItems.some((item) => item.productId._id === product._id)
+                                                        ? "text-red-500 fill-current"
+                                                        : "text-gray-500"
+                                                }`}
+                                            />
+
+                                        </button>
+
+                                        {/* Product Image */}
                                         <img
                                             src={`/product-images/${product.image}`}
                                             alt={product.name}
@@ -367,16 +448,16 @@ function ShoppingHome() {
                                         />
                                         <h3 className="font-bold text-lg mb-2">{product.name}</h3>
                                         <p className="mb-1">
-                                        <strong>
-                                            {product.salesPrice ? (
-                                            <>
-                                                <span className="line-through text-gray-500">${product.price}</span> {/* Original price */}
-                                                <span className="text-red-500 ml-2">${product.salesPrice}</span> {/* Discounted price */}
-                                            </>
-                                            ) : (
-                                            <span>${product.price}</span> /* Regular price */
-                                            )}
-                                        </strong>
+                                            <strong>
+                                                {product.salesPrice ? (
+                                                    <>
+                                                        <span className="line-through text-gray-500">${product.price}</span>
+                                                        <span className="text-red-500 ml-2">${product.salesPrice}</span>
+                                                    </>
+                                                ) : (
+                                                    <span>${product.price}</span>
+                                                )}
+                                            </strong>
                                         </p>
 
                                         <p className="mb-1"><strong>{product.brand}</strong></p>
@@ -385,7 +466,8 @@ function ShoppingHome() {
                                         {product.quantityInStock === 0 && (
                                             <p className="text-red-600 font-bold text-lg text-center w-full">Out of Stock</p>
                                         )}
-                                        {/* Add to Cart button */}
+
+                                        {/* Add to Cart Button */}
                                         <div className="mt-auto w-full">
                                             <Button
                                                 onClick={() => handleAddToCart(product._id, product.quantityInStock)}
@@ -402,6 +484,7 @@ function ShoppingHome() {
                         )}
                     </div>
                 </div>
+
             </div>
 
             {isProductDetailsOpen && selectedProduct && (
