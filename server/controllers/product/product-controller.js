@@ -571,7 +571,25 @@ const applyDiscount = async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 };
-
+// Add this route in your backend
+const deleteCategory =  async (req, res) => {
+    const { category } = req.params;
+  
+    try {
+      // Delete all products with the given category
+      const result = await Product.deleteMany({ category });
+  
+      if (result.deletedCount > 0) {
+        res.json({ success: true, message: `${result.deletedCount} products deleted successfully` });
+      } else {
+        res.status(404).json({ success: false, error: 'No products found in this category' });
+      }
+    } catch (error) {
+      console.error('Error deleting products by category:', error);
+      res.status(500).json({ success: false, error: 'Server error' });
+    }
+}
+  
 const undoDiscount = async (req, res) => {
     const { productId } = req.body;
 
@@ -603,6 +621,7 @@ const undoDiscount = async (req, res) => {
     }
 };
 
+
   module.exports = {getFilteredProducts, getFilterOptions, searchProducts, deleteProduct, updateStock, 
     getAllProducts, getIds, addProduct, filterProducts, addComment, addRating, getCommentsByProduct, 
-    getProductDetails, updateCommentApproval, getPendingComments, setProductPrice, applyDiscount, undoDiscount}
+    getProductDetails, updateCommentApproval, getPendingComments, setProductPrice, applyDiscount, undoDiscount, deleteCategory}

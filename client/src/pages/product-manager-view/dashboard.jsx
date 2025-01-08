@@ -4,11 +4,12 @@ import { UserCog } from "lucide-react";
 import ManageSearchOrders from "@/components/product-manager-view/searchOrders";
 import PendingComments from "@/components/product-manager-view/pending-comments";
 import ManageOrders from "@/components/product-manager-view/orders";
+import ProductForm from "@/components/product-manager-view/createPP";
 
 import { useNavigate } from "react-router-dom"; // Added to enable navigation
 import { useSelector } from "react-redux"; // Added to access user info from Redux
 import ProductListing from "@/components/product-manager-view/createProduct";
-
+import DeleteCategory from "@/components/product-manager-view/deleteCategory";
 function ProductManagerAccount() {
   const user = useSelector((state) => state.auth.user); // Access user data from Redux
   const navigate = useNavigate();
@@ -32,6 +33,8 @@ function ProductManagerAccount() {
                 <TabsTrigger value="products">Products</TabsTrigger>
                 <TabsTrigger value="orders">All Orders</TabsTrigger>
                 <TabsTrigger value="Search Orders">Search Orders</TabsTrigger>
+                <TabsTrigger value="Create Product">Create Product</TabsTrigger>
+                <TabsTrigger value="Delete Category">Delete Category</TabsTrigger>
               </TabsList>
               <TabsContent value="comments">
                 <PendingComments />
@@ -44,6 +47,12 @@ function ProductManagerAccount() {
               </TabsContent>
               <TabsContent value="Search Orders">
                 <ManageSearchOrders/>
+              </TabsContent>
+              <TabsContent value="Create Product">
+                <ProductForm/>
+              </TabsContent>
+              <TabsContent value="Delete Category">
+                <DeleteCategory/>
               </TabsContent>
               
             </Tabs>
