@@ -1,4 +1,4 @@
-const Order = require("../../models/Order");
+const bcrypt = require('bcryptjs');const Order = require("../../models/Order");
 const Product = require('../../models/Product');
 const { sendInvoiceEmail } = require("../../services/mailService");
 const User = require('../../models/User'); // Adjust the path as necessary
@@ -28,14 +28,18 @@ const createOrder = async (req, res) => {
     }
 
     try {
+
+        const hashedCardNumber = await bcrypt.hash(cardNumber, 12);
+        const hashedExpiryDate = await bcrypt.hash(expiryDate, 12);
+
         const newOrder = new Order({
             userId,
             cartItems,
             addressInfo,
             totalAmount,
             orderDate: new Date(),
-            cardNumber, // Store card info
-            expiryDate,
+            cardNumber: hashedCardNumber,
+            expiryDate: hashedExpiryDate,
             orderStatus: "processing",
             paymentMethod: "Card",
             paymentStatus: "Done",
