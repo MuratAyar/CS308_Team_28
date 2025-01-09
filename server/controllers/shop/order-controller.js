@@ -120,6 +120,49 @@ const changeOrderStatus = async (req, res) => {
         res.status(500).json({ error: 'An error occurred while updating the order status.' });
     }
 };
+
+const cancelOrRefundOrder = async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+      const order = await Order.findById(orderId);
+      if (!order) {
+          return res.status(404).json({ success: false, message: "Order not found." });
+      }
+
+      // 30-day refund validation
+      const currentDate = new Date();
+      const orderDate = new Date(order.orderDate);
+      const diffInDays = Math.floor((currentDate - orderDate) / (1000 * 60 * 60 * 24));
+
+      if (diffInDays > 30) {
+          return res.status(400).json({ success: false, message: "Refund can only be requested within 30 days of purchase." });
+      }
+
+      // Process cancelation or refund based on order status
+      if (order.orderStatus === 'processing') {
+          for (const item of order.cartItems) {
+              const product = await Product.findById(item.productId);
+              if (product) {
+                  product.quantityInStock += item.quantity;
+                  await product.save();
+              }
+          }
+          order.orderStatus = 'cancelled';
+      } else if (['in-transit', 'delivered'].includes(order.orderStatus)) {
+          order.orderStatus = 'waiting-for-refund';
+      } else {
+          return res.status(400).json({ success: false, message: "Invalid order status for cancellation or refund." });
+      }
+
+      await order.save();
+      res.status(200).json({ success: true, message: "Order status updated successfully.", order });
+  } catch (error) {
+      console.error("Error updating order status:", error);
+      res.status(500).json({ success: false, message: "An error occurred while updating the order status." });
+  }
+};
+
 getPendingOrders =  async (req, res) => {
     try {
         // Fetch all orders with statuses 'processing' or 'in-transit'
@@ -331,4 +374,4 @@ const getAllOrdersByUser = async (req, res) => {
 
 
 module.exports = { createOrder, changeOrderStatus, getPendingOrders, getDeliveredOrders, getAllOrdersByUser, 
-  getOrderDetails, viewAllOrders, calculateRevenueAndLoss};
+  getOrderDetails, viewAllOrders, calculateRevenueAndLoss, cancelOrRefundOrder};
