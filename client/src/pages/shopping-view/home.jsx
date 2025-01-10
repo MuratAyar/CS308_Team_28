@@ -109,11 +109,13 @@ function ShoppingHome() {
             const data = await response.json();
     
             if (data.products) {
-                setProducts(data.products);
+                const filteredProducts = data.products.filter((product) => product.price > 0);
+                setProducts(filteredProducts);
                 setTotalPages(data.totalPages || 1); // Adjust for pagination
             } else {
                 // Handle cases where data is directly returned as an array (e.g., search results)
-                setProducts(data);
+                const filteredProducts = data.products.filter((product) => product.price > 0);
+                setProducts(filteredProducts);
                 setTotalPages(Math.ceil((data.length || 0) / limit)); // Adjust pagination
             }
         } catch (error) {
