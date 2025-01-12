@@ -6,6 +6,7 @@ import CalculateRevenueLoss from "@/components/sales-manager-view/revenueloss";
 import { useNavigate } from "react-router-dom"; // Added to enable navigation
 import { useSelector } from "react-redux"; // Added to access user info from Redux
 import SalesManagerDiscount from "@/pages/sales-manager-view/SalesManagerDiscount";
+import EvaluateRefunds from "@/components/sales-manager-view/evaluateRefunds";
 
 function SalesManagerAccount() {
   const user = useSelector((state) => state.auth.user); // Access user data from Redux
@@ -19,22 +20,26 @@ function SalesManagerAccount() {
           <div className="flex flex-col rounded-lg border bg-background p-6 shadow-sm">
             <Tabs defaultValue="comments">
               <TabsList>
-                <TabsTrigger value="comments">Set Prices</TabsTrigger>
-                <TabsTrigger value="products">Apply Discounts</TabsTrigger>
-                <TabsTrigger value="orders">View Invoices</TabsTrigger>
-                <TabsTrigger value="Search Orders">Calculate Revenue/Loss</TabsTrigger>
+                <TabsTrigger value="Set Prices">Set Prices</TabsTrigger>
+                <TabsTrigger value="Apply Discounts">Apply Discounts</TabsTrigger>
+                <TabsTrigger value="View Invoices">View Invoices</TabsTrigger>
+                <TabsTrigger value="Calculate Revenue/Loss">Calculate Revenue/Loss</TabsTrigger>
+                <TabsTrigger value="Evaluate Waiting Refunds">Evaluate Waiting Refunds</TabsTrigger>
               </TabsList>
-              <TabsContent value="comments">
+              <TabsContent value="Set Prices">
                 {<SetPrices />}
               </TabsContent>
-              <TabsContent value="products">
+              <TabsContent value="Apply Discounts">
                 {<SalesManagerDiscount />}
               </TabsContent>
-              <TabsContent value="orders">
+              <TabsContent value="View Invoices">
                 <ViewInvoices />
               </TabsContent>
-              <TabsContent value="Search Orders">
+              <TabsContent value="Calculate Revenue/Loss">
                 <CalculateRevenueLoss/>
+              </TabsContent>
+              <TabsContent value="Evaluate Waiting Refunds">
+                <EvaluateRefunds/>
               </TabsContent>
               
             </Tabs>

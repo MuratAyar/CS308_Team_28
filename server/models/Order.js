@@ -23,7 +23,7 @@ const OrderSchema = new mongoose.Schema({
     },
     orderStatus: {
         type: String,
-        enum: ['processing', 'in-transit', 'delivered', 'cancelled', 'waiting-for-refund'], // Enum with allowed values
+        enum: ['processing', 'in-transit', 'delivered', 'cancelled', 'waiting-for-refund', 'refund-approved'], // Enum with allowed values
         default: 'processing', // Default value
     },
     paymentMethod : String,

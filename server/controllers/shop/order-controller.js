@@ -376,6 +376,78 @@ const getAllOrdersByUser = async (req, res) => {
     }
   };
 
+  const getWaitingRefunds = async (req, res) => {
+    try {
+      // Fetch all orders with status 'waiting-for-refund'
+      const waitingRefunds = await Order.find({ orderStatus: 'waiting-for-refund' }).populate('userId', 'name email'); // Populating user details if needed
+  
+      res.status(200).json({
+        success: true,
+        count: waitingRefunds.length,
+        data: waitingRefunds,
+      });
+    } catch (error) {
+      console.error('Error fetching waiting refunds:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Server Error: Unable to fetch waiting refunds.',
+      });
+    }
+  };
+
+  const evaluateRefund = async (req, res) => {
+    const { orderId } = req.body;
+  
+    // Validate request
+    if (!orderId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Order ID is required.',
+      });
+    }
+  
+    try {
+      // Find the order by ID
+      const order = await Order.findById(orderId);
+  
+      // Check if order exists
+      if (!order) {
+        return res.status(404).json({
+          success: false,
+          message: 'Order not found.',
+        });
+      }
+  
+      // Check if the current status is 'waiting-for-refund'
+      if (order.orderStatus !== 'waiting-for-refund') {
+        return res.status(400).json({
+          success: false,
+          message: `Cannot evaluate refund for orders with status '${order.orderStatus}'.`,
+        });
+      }
+  
+      // Update the order status to 'refund-approved'
+      order.orderStatus = 'refund-approved';
+      order.refundApprovedBy = req.user.id; // Assuming you track who approved the refund
+      order.refundApprovedAt = Date.now();
+  
+      // Save the updated order
+      await order.save();
+  
+      res.status(200).json({
+        success: true,
+        message: 'Refund approved successfully.',
+        data: order,
+      });
+    } catch (error) {
+      console.error('Error evaluating refund:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Server Error: Unable to evaluate refund.',
+      });
+    }
+  };
+
 
 module.exports = { createOrder, changeOrderStatus, getPendingOrders, getDeliveredOrders, getAllOrdersByUser, 
-  getOrderDetails, viewAllOrders, calculateRevenueAndLoss, cancelOrRefundOrder};
+  getOrderDetails, viewAllOrders, calculateRevenueAndLoss, cancelOrRefundOrder, getWaitingRefunds, evaluateRefund};
