@@ -434,6 +434,25 @@ const getAllOrdersByUser = async (req, res) => {
         // Save the updated order
         await order.save();
 
+        // Re-increase product quantities based on cartItems
+        const productUpdates = order.cartItems.map(async (item) => {
+            try {
+                // Find the product by productId
+                const product = await Product.findById(item.productId);
+                if (product) {
+                    product.quantityInStock += item.quantity; // Increase stock by the quantity in the order
+                    await product.save();
+                } else {
+                    console.error(`Product with ID ${item.productId} not found.`);
+                }
+            } catch (productError) {
+                console.error(`Error updating product stock for ID ${item.productId}:`, productError);
+            }
+        });
+
+        // Wait for all product updates to complete
+        await Promise.all(productUpdates);
+
         // Notify user via email
         try {
             const user = await User.findById(order.userId); // Ensure you have the user email
@@ -461,6 +480,7 @@ const getAllOrdersByUser = async (req, res) => {
         });
     }
 };
+
 
 
 
