@@ -164,4 +164,31 @@ async function sendDiscountNotificationEmail(to, product, discountRate) {
   }
 }
 
-module.exports = { sendWelcomeEmail, sendFeedbackEmail, sendInvoiceEmail, sendDiscountNotificationEmail };
+async function sendRefundNotificationEmail(to, product) {
+  const emailSubject = "Refund Approved Succesfully Notification";
+  const emailBody = `
+      <h1>Refund Applied!</h1>
+      <p>A refund applied to products:</p>
+      <ul>
+          <li><strong>Product Name:</strong> ${product.name}</li>
+      </ul>
+      <p>Thanks for choosing us!</p>
+  `;
+
+  const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: to,
+      subject: emailSubject,
+      html: emailBody,
+  };
+
+  try {
+      await transporter.sendMail(mailOptions);
+      console.log(`refund notification email sent to ${to}`);
+  } catch (error) {
+      console.error("Error sending refund notification email:", error);
+      throw error;
+  }
+}
+
+module.exports = { sendWelcomeEmail, sendFeedbackEmail, sendInvoiceEmail, sendDiscountNotificationEmail, sendRefundNotificationEmail };

@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');const Order = require("../../models/Order");
 const Product = require('../../models/Product');
-const { sendInvoiceEmail } = require("../../services/mailService");
+const { sendInvoiceEmail, sendRefundNotificationEmail } = require("../../services/mailService");
 const User = require('../../models/User'); // Adjust the path as necessary
 
 
@@ -397,56 +397,72 @@ const getAllOrdersByUser = async (req, res) => {
 
   const evaluateRefund = async (req, res) => {
     const { orderId } = req.body;
-  
+
     // Validate request
     if (!orderId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Order ID is required.',
-      });
-    }
-  
-    try {
-      // Find the order by ID
-      const order = await Order.findById(orderId);
-  
-      // Check if order exists
-      if (!order) {
-        return res.status(404).json({
-          success: false,
-          message: 'Order not found.',
-        });
-      }
-  
-      // Check if the current status is 'waiting-for-refund'
-      if (order.orderStatus !== 'waiting-for-refund') {
         return res.status(400).json({
-          success: false,
-          message: `Cannot evaluate refund for orders with status '${order.orderStatus}'.`,
+            success: false,
+            message: "Order ID is required.",
         });
-      }
-  
-      // Update the order status to 'refund-approved'
-      order.orderStatus = 'refund-approved';
-      order.refundApprovedBy = req.user.id; // Assuming you track who approved the refund
-      order.refundApprovedAt = Date.now();
-  
-      // Save the updated order
-      await order.save();
-  
-      res.status(200).json({
-        success: true,
-        message: 'Refund approved successfully.',
-        data: order,
-      });
-    } catch (error) {
-      console.error('Error evaluating refund:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Server Error: Unable to evaluate refund.',
-      });
     }
-  };
+
+    try {
+        // Find the order by ID
+        const order = await Order.findById(orderId);
+
+        // Check if order exists
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: "Order not found.",
+            });
+        }
+
+        // Check if the current status is 'waiting-for-refund'
+        if (order.orderStatus !== "waiting-for-refund") {
+            return res.status(400).json({
+                success: false,
+                message: `Cannot evaluate refund for orders with status '${order.orderStatus}'.`,
+            });
+        }
+
+        // Update the order status to 'refund-approved'
+        order.orderStatus = "refund-approved";
+        order.refundApprovedBy = req.user.id; // Assuming you track who approved the refund
+        order.refundApprovedAt = Date.now();
+
+        // Save the updated order
+        await order.save();
+
+        // Notify user via email
+        try {
+            const user = await User.findById(order.userId); // Ensure you have the user email
+            if (user) {
+                const product = order.cartItems[0]; // Replace with actual structure
+                await sendRefundNotificationEmail(user.email, product); // Ensure await is used
+                console.log("Refund notification email sent successfully.");
+            } else {
+                console.error("User not found for email notification.");
+            }
+        } catch (emailError) {
+            console.error("Error sending refund notification email:", emailError);
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Refund approved successfully.",
+            data: order,
+        });
+    } catch (error) {
+        console.error("Error evaluating refund:", error);
+        res.status(500).json({
+            success: false,
+            message: "Server Error: Unable to evaluate refund.",
+        });
+    }
+};
+
+
 
 
 module.exports = { createOrder, changeOrderStatus, getPendingOrders, getDeliveredOrders, getAllOrdersByUser, 
