@@ -5,6 +5,8 @@ const Comment = require('../../models/Comment');
 const {authorizeRole, authenticateToken} = require('../../middleware/index')
 const mongoose = require('mongoose')
 const { sendDiscountNotificationEmail } = require("../../services/mailService"); // Import mail service
+const Wishlist = require("../../models/Wishlist");
+const User = require("../../models/User"); // Ensure this path is correct based on your project structure
 
 const getFilteredProducts = async (req, res) => {
   try {
@@ -530,6 +532,9 @@ const setProductPrice = async (req, res) => {
         res.status(500).json({ message: 'Server error. Unable to update product price.' });
     }
 };
+
+// server/controllers/product-controller.js
+
 const applyDiscount = async (req, res) => {
     const { productId, discountRate } = req.body;
 
@@ -550,27 +555,51 @@ const applyDiscount = async (req, res) => {
 
         // Apply discount
         product.salesPrice = parseFloat((product.price * (1.00 - discountRate / 100.00)).toFixed(2));
-      
         await product.save();
+
+        // Fetch all wishlists containing this product
+        const wishlists = await Wishlist.find({ "items.productId": productId }).populate('userId', 'email userName');
+
+        if (wishlists.length === 0) {
+            console.log('No wishlists contain this product. No emails to send.');
+        } else {
+            // Extract unique users to avoid sending multiple emails to the same user if they have the product multiple times
+            const users = wishlists.map(wishlist => wishlist.userId);
+            const uniqueUsersMap = new Map();
+            users.forEach(user => {
+                if (user && !uniqueUsersMap.has(user._id.toString())) {
+                    uniqueUsersMap.set(user._id.toString(), user);
+                }
+            });
+            const uniqueUsers = Array.from(uniqueUsersMap.values());
+
+            // Send emails to all unique users
+            const emailPromises = uniqueUsers.map(user => {
+                if (user.email) {
+                    return sendDiscountNotificationEmail(user.email, product, discountRate);
+                } else {
+                    console.warn(`User with ID ${user._id} does not have an email address.`);
+                    return Promise.resolve(); // Skip users without email
+                }
+            });
+
+            // Wait for all emails to be sent
+            await Promise.all(emailPromises);
+            console.log(`Discount notification emails sent to ${uniqueUsers.length} users.`);
+        }
 
         res.status(200).json({
             message: 'Discount applied successfully.',
             product,
         });
-        
-        // Send discount notification email
-        const trialEmail = "ayar.murat555@gmail.com"; // Trial user email
-        try {
-            await sendDiscountNotificationEmail(trialEmail, product, discountRate);
-        } catch (emailError) {
-            console.error("Error sending discount notification email:", emailError);
-        }
 
     } catch (error) {
         console.error('Error applying discount:', error);
         res.status(500).json({ error: 'Server error' });
     }
 };
+
+
 // Add this route in your backend
 const deleteCategory =  async (req, res) => {
     const { category } = req.params;

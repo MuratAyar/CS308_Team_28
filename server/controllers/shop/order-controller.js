@@ -313,9 +313,9 @@ const getAllOrdersByUser = async (req, res) => {
           const quantity = item.quantity || 1;
           const productKey = item.title || item.productId; // Use title if available, otherwise productId
   
-          // Calculate revenue: original sale price or salePrice
-          const revenue = item.salePrice 
-            ? parseFloat(item.salePrice) * quantity 
+          // Calculate revenue: original sale price or salesPrice
+          const revenue = item.salesPrice 
+            ? parseFloat(item.salesPrice) * quantity 
             : parseFloat(item.price) * quantity;
   
           // Add to total revenue
@@ -328,12 +328,12 @@ const getAllOrdersByUser = async (req, res) => {
             revenueBreakdown[productKey] = revenue;
           }
   
-          // Calculate loss if salePrice exists
-          if (item.salePrice) {
+          // Calculate loss if salesPrice exists
+          if (item.salesPrice) {
             const originalPrice = parseFloat(item.price) * quantity;
-            const salePrice = parseFloat(item.salePrice) * quantity;
+            const salesPrice = parseFloat(item.salesPrice) * quantity;
   
-            const loss = originalPrice - salePrice;
+            const loss = originalPrice - salesPrice;
   
             // Add to total loss
             totalLoss += loss;

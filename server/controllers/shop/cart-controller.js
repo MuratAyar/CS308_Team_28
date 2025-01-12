@@ -87,7 +87,7 @@ const fetchCartItems = async (req,res)=>{
             cart.items = validItems;
             await cart.save();
         }
-        // Calculate total cost by summing up each item's (price or salePrice) * quantity
+        // Calculate total cost by summing up each item's (price or salesPrice) * quantity
         const totalCost = validItems.reduce((total, item) => {
             const price = item.productId.salesPrice || item.productId.price;
             return total + price * item.quantity;

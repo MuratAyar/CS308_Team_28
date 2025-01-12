@@ -15,7 +15,7 @@ function ShoppingProductTile({
             alt={product?.title}
             className="w-full h-[300px] object-cover rounded-t-lg"
           />
-          {product?.salePrice > 0 ? (
+          {product?.salesPrice > 0 ? (
             <Badge className="absolute top-2 left-2 bg-red-500 hover:bg-red-600">
               Sale
             </Badge>
@@ -34,14 +34,14 @@ function ShoppingProductTile({
           <div className="flex justify-between items-center mb-2">
             <span
               className={`${
-                product?.salePrice > 0 ? "line-through" : ""
+                product?.salesPrice > 0 ? "line-through" : ""
               } text-lg font-semibold text-primary`}
             >
               ${product?.price}
             </span>
-            {product?.salePrice > 0 ? (
+            {product?.salesPrice > 0 ? (
               <span className="text-lg font-semibold text-primary">
-                ${product?.salePrice}
+                ${product?.salesPrice}
               </span>
             ) : null}
           </div>
