@@ -20,6 +20,10 @@ const UserSchema = new mongoose.Schema({
     role : {
         type : String,
         default : 'user'
+    },
+    taxID : {
+        type : String,
+        default : 'TR'
     }
 });
 

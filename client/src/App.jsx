@@ -77,7 +77,7 @@ function App() {
         <Route path="account/delete-account" element={<DeleteAccount />} />
         <Route path="account/account-deleted" element={<AccountDeleted />} />
         <Route path="order-success/:orderId" element={<OrderSuccess />} />
-
+        <Route path="wishlist" element={<WishlistPage />} />;
 
         </Route>
         <Route path="unauth-page" element={<UnAuthPage/>}/>
@@ -90,7 +90,6 @@ function App() {
         <Route path="/smanager" element={<SalesManagerLayout />}>
           <Route path="dashboard" element={<SalesManagerAccount />} />
         </Route>
-        <Route path="/wishlist" element={<WishlistPage />} />;
       </Routes>
     </div>
   )

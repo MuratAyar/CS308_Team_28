@@ -107,14 +107,20 @@ function ShoppingHome() {
             }
     
             const data = await response.json();
-    
+            console.log(data);
+
             if (data.products) {
                 const filteredProducts = data.products.filter((product) => product.price > 0);
                 setProducts(filteredProducts);
                 setTotalPages(data.totalPages || 1); // Adjust for pagination
+            } else if (data){
+                const filteredProducts = data.filter((product) => product.price > 0);
+                setProducts(filteredProducts);
+                setTotalPages(data.totalPages || 1); // Adjust for pagination
             } else {
+                
                 // Handle cases where data is directly returned as an array (e.g., search results)
-                const filteredProducts = data.products.filter((product) => product.price > 0);
+                const filteredProducts = data.filter((product) => product.price > 0);
                 setProducts(filteredProducts);
                 setTotalPages(Math.ceil((data.length || 0) / limit)); // Adjust pagination
             }

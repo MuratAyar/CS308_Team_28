@@ -15,7 +15,7 @@ router.get('/search', searchProducts);
 router.get('/all', getAllProducts);
 // Route to Get Products with Filtering and Pagination
 router.get('/filter', filterProducts);
-router.put('/update-stock/:id',authenticateToken, authorizeRole('product'), updateStock);
+router.put('/update-stock/:id', updateStock);
 // Add a new product
 router.post('/add', addProduct);
 // Get Product IDs based on name, distributor, and serialNumber from request body

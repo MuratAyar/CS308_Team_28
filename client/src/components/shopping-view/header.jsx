@@ -62,7 +62,7 @@ function HeaderRightContent() {
     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
       {/* Wishlist Icon */}
       <Button
-        onClick={() => navigate("/wishlist")} // Navigate to the wishlist page
+        onClick={() => navigate("/shop/wishlist")} // Navigate to the wishlist page
         variant="outline"
         size="icon"
       >
