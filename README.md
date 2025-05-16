@@ -14,26 +14,7 @@
 
 ## ✨ Architecture at a Glance
 
-```
- Internet ↴               ┌──────────────────────────┐
-  Client  ─▶  HTTPS LB ─▶ │  frontend  (React + Nginx│  [LoadBalancer]
-                         └──────────┬───────────────┘
-                                    │ internal call
-                                    ▼
-                 ┌──────────────────────────┐
-                 │ backend‑main  (Express)  │  [ClusterIP]
-                 └──────────────────────────┘
-                 ┌──────────────────────────┐
-                 │ backend‑dummy (health)   │  [ClusterIP]
-                 └──────────────────────────┘
-                                    │
-                                    ▼
-                       MongoDB VM 10.132.0.2
-
- Every page → passiveLogger (Cloud Run) → Cloud Logging
-```
-
-*Full Draw\.io diagram available in `docs/architecture.drawio`.*
+![GKE - Frontend (React+nginx) (1)](https://github.com/user-attachments/assets/b2384a6a-2572-4616-afda-bf90ac2f8bf1)
 
 ---
 
@@ -178,8 +159,8 @@ Monthly estimate (europe‑west4): **\~ \$105** – fully covered by the \$300
 
 ## ✍️ Authors
 
-* **Murat Ayar** — cloud migration & backend refactor
-* **Efe Güçlü** — frontend & QA
+* **Murat Ayar**
+* **Efe Güçlü**
 
 ---
 
