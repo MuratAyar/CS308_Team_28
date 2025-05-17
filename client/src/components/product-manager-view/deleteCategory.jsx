@@ -1,5 +1,7 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from 'react'; // Properly import React and hooks
 import axios from 'axios';
+import { apiUrl } from "../../config/api";
 
 const DeleteCategory = () => {
   const [products, setProducts] = useState([]);
@@ -9,7 +11,7 @@ const DeleteCategory = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/products/all');
+        const response = await axios.get(apiUrl("/api/products/all"));
         setProducts(response.data.products);
 
         // Extract unique categories from products
@@ -30,7 +32,7 @@ const DeleteCategory = () => {
     }
 
     try {
-      const response = await axios.delete(`http://localhost:5000/api/products/delete-category/${selectedCategory}`);
+      const response = await axios.delete(apiUrl(`/api/products/delete-category/${selectedCategory}`));
       if (response.data.success) {
         // Remove deleted products from state
         setProducts((prevProducts) =>

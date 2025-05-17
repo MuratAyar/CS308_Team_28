@@ -3,6 +3,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { CheckCircle, Loader2 } from "lucide-react";
+import { Label } from '../ui/label';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { Card, CardHeader, CardContent } from '../ui/card';
+import { apiUrl } from '../../config/api';
 
 const EvaluateRefunds = () => {
   // State variables
@@ -16,8 +21,8 @@ const EvaluateRefunds = () => {
   const token = localStorage.getItem("authToken");
 
   // Backend API base URLs
-  const GET_ENDPOINT = "http://localhost:5000/api/shop/order/waiting-refunds";
-  const PUT_ENDPOINT = "http://localhost:5000/api/shop/order/evaluate-refund";
+  const GET_ENDPOINT = apiUrl("/api/shop/order/waiting-refunds");
+  const PUT_ENDPOINT = apiUrl("/api/shop/order/evaluate-refund");
 
   // Fetch orders with 'waiting-for-refund' status on component mount
   useEffect(() => {

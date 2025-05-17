@@ -1,4 +1,6 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState } from "react";
+import { apiUrl } from "../../config/api";
 import axios from "axios";
 
 const ManageOrders = () => {
@@ -19,7 +21,7 @@ const ManageOrders = () => {
 
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/shop/order/allOrders",
+          apiUrl("/api/shop/order/allOrders"),
           { headers: { Authorization: `Bearer ${token}` } }
         );
         console.log("Fetched orders:", response.data);
@@ -49,7 +51,7 @@ const ManageOrders = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/shop/order/update-order-status/${orderId}`,
+        apiUrl(`/api/shop/order/update-order-status/${orderId}`),
         { orderStatus: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -66,7 +68,7 @@ const ManageOrders = () => {
         setError("Failed to update order status.");
       }
     } catch (err) {
-      setError("Error updating order status.");
+      setError(`Error updating order status: ${err.message || "Unknown error"}`);
     }
   };
 

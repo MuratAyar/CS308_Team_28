@@ -1,5 +1,6 @@
 import axios from "axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { apiUrl } from "../../../config/api";
 
 const initialState = {
   wishlistItems: [], // Stores the wishlist items
@@ -12,7 +13,7 @@ export const fetchWishlistItems = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("authToken");
-      const response = await axios.get("http://localhost:5000/api/wishlist/get", {
+      const response = await axios.get(apiUrl("/api/wishlist/get"), {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;
@@ -28,7 +29,7 @@ export const removeWishlistItem = createAsyncThunk(
   async (productId, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("authToken");
-      await axios.delete(`http://localhost:5000/api/wishlist/remove/${productId}`, {
+      await axios.delete(apiUrl(`/api/wishlist/remove/${productId}`), {
         headers: { Authorization: `Bearer ${token}` },
       });
       return productId; // Return the productId to update the state
@@ -45,7 +46,7 @@ export const addWishlistItemToCart = createAsyncThunk(
     try {
       const token = localStorage.getItem("authToken");
       const response = await axios.post(
-        "http://localhost:5000/api/cart/add",
+        apiUrl("/api/cart/add"),
         { productId, quantity },
         {
           headers: { Authorization: `Bearer ${token}` },

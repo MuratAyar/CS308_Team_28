@@ -1,36 +1,71 @@
-const bcrypt = require('bcryptjs');const Order = require("../../models/Order");
+const bcrypt = require('bcryptjs');
+const Order = require("../../models/Order");
 const Product = require('../../models/Product');
 const { sendInvoiceEmail, sendRefundNotificationEmail } = require("../../services/mailService");
 const User = require('../../models/User'); // Adjust the path as necessary
 
 
 const createOrder = async (req, res) => {
-    const { userId, cartItems, addressInfo, cardNumber, expiryDate, totalAmount } = req.body;
+    const { userId, cartItems, addressInfo, cardNumber, expiryDate, totalAmount, paymentMethod } = req.body;
 
-    // Validate card number
-    if (!/^\d{16}$/.test(cardNumber) && cardNumber != "null") {
-        return res.status(400).json({
-            success: false,
-            message: "Invalid card number. It must be 16 digits.",
-        });
-    }
-
-    // Validate expiry date
-    const inputDate = new Date(expiryDate);
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    if (inputDate < tomorrow && inputDate != "null") {
-        return res.status(400).json({
-            success: false,
-            message: "Invalid expiry date. It must be no earlier than tomorrow.",
-        });
-    }
+    console.log("Creating order with payment method:", paymentMethod);
 
     try {
+        // Basic validation
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                message: "User ID is required.",
+            });
+        }
 
-        const hashedCardNumber = await bcrypt.hash(cardNumber, 12);
-        const hashedExpiryDate = await bcrypt.hash(expiryDate, 12);
+        if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Cart items are required and must be a non-empty array.",
+            });
+        }
+
+        if (!addressInfo || !addressInfo.address || !addressInfo.city || !addressInfo.pincode || !addressInfo.phone) {
+            return res.status(400).json({
+                success: false,
+                message: "Complete address information is required.",
+            });
+        }
+
+        // Card validation only if payment method is Card
+        if (paymentMethod === "Card") {
+            // Validate card number
+            if (!cardNumber || (!/^\d{16}$/.test(cardNumber) && cardNumber !== "null")) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid card number. It must be 16 digits.",
+                });
+            }
+
+            // Validate expiry date
+            if (!expiryDate || expiryDate === "null") {
+                return res.status(400).json({
+                    success: false,
+                    message: "Card expiry date is required.",
+                });
+            }
+
+            const inputDate = new Date(expiryDate);
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+
+            if (isNaN(inputDate.getTime()) || inputDate < tomorrow) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid expiry date. It must be in the future.",
+                });
+            }
+        }
+
+        // Hash card details if provided
+        const hashedCardNumber = cardNumber !== "null" ? await bcrypt.hash(cardNumber, 12) : "null";
+        const hashedExpiryDate = expiryDate !== "null" ? await bcrypt.hash(expiryDate, 12) : "null";
 
         const newOrder = new Order({
             userId,
@@ -41,27 +76,39 @@ const createOrder = async (req, res) => {
             cardNumber: hashedCardNumber,
             expiryDate: hashedExpiryDate,
             orderStatus: "processing",
-            paymentMethod: "Card",
+            paymentMethod: paymentMethod || "Card",
             paymentStatus: "Done",
         });
 
-        await newOrder.save();
-
+        // Check product stock before finalizing the order
         for (const item of cartItems) {
             const product = await Product.findById(item.productId);
 
-            if (product) {
-                // Ensure there is enough stock before updating
-                if (product.quantityInStock >= item.quantity) {
-                    product.quantityInStock -= item.quantity; // Decrease stock
-                    product.popularity += 1; // Increase popularity
-                    await product.save(); // Save the updated product
-                } else {
-                    throw new Error(`Insufficient stock for product: ${product.name}`);
-                }
-            } else {
-                throw new Error(`Product not found: ${item.productId}`);
+            if (!product) {
+                return res.status(404).json({
+                    success: false,
+                    message: `Product not found: ${item.productId}`,
+                });
             }
+
+            // Ensure there is enough stock
+            if (product.quantityInStock < item.quantity) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Insufficient stock for product: ${product.name}. Only ${product.quantityInStock} available.`,
+                });
+            }
+        }
+
+        // Save the order
+        await newOrder.save();
+
+        // Update product stock
+        for (const item of cartItems) {
+            const product = await Product.findById(item.productId);
+            product.quantityInStock -= item.quantity; // Decrease stock
+            product.popularity += 1; // Increase popularity
+            await product.save(); // Save the updated product
         }
 
         // Fetch user's email from the database
@@ -88,7 +135,7 @@ const createOrder = async (req, res) => {
         console.error("Error creating order:", error);
         return res.status(500).json({
             success: false,
-            message: "Error creating order.",
+            message: "Error creating order: " + error.message,
         });
     }
 };

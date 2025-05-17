@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { apiUrl } from "../../config/api";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
@@ -17,7 +18,7 @@ const DeleteAccount = () => {
             console.log("Sending request to delete account with email and password:", { email, password });
             
             // Use the full URL for deleteUserAccount
-            const response = await axios.delete('http://localhost:5000/api/auth/delete-account', {
+            const response = await axios.delete('apiUrl("/api/auth/delete-account")', {
                 data: { email, password }
             });
             

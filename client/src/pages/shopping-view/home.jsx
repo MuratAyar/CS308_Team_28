@@ -1,4 +1,6 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState, Fragment } from "react";
+import { apiUrl } from "../../config/api";
 import { ArrowUpDownIcon, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
@@ -19,6 +21,7 @@ function ShoppingHome() {
     const [loading, setLoading] = useState(false);
     const limit = 12; // Number of products per page
   
+    // eslint-disable-next-line no-unused-vars
     const { wishlistItems, isLoading } = useSelector((state) => state.wishlist);
 
     const [filters, setFilters] = useState({
@@ -44,10 +47,12 @@ function ShoppingHome() {
     const { toast } = useToast();
     const { cartItems } = useSelector((state) => state.shopCart);
     
+    // eslint-disable-next-line no-unused-vars
     const [guestId, setGuestId] = useState(localStorage.getItem("guestId"));
 
     const [isProductDetailsOpen, setProductDetailsOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    // eslint-disable-next-line no-unused-vars
     const [product, setProduct] = useState(null)
 
     const [searchParams] = useSearchParams(); // Get search parameters from the URL
@@ -57,6 +62,7 @@ function ShoppingHome() {
     setSelectedProduct(product);
     setProductDetailsOpen(true);
     };
+    // eslint-disable-next-line no-unused-vars
     const [productId, setProductId] = useState(null);
 
     const handleCloseProductDetails = () => {
@@ -66,7 +72,7 @@ function ShoppingHome() {
 
     const fetchFilterOptions = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/products/filters");
+            const response = await fetch(apiUrl("/api/products/filters"));
             if (!response.ok) {
                 throw new Error("Failed to fetch filter options");
             }
@@ -99,7 +105,7 @@ function ShoppingHome() {
     
             const endpoint = safeQuery ? "search" : "filter"; // Decide endpoint based on query presence
             const response = await fetch(
-                `http://localhost:5000/api/products/${endpoint}?${queryParams}`
+                apiUrl(`/api/products/${endpoint}?${queryParams}`)
             );
     
             if (!response.ok) {
@@ -149,7 +155,7 @@ function ShoppingHome() {
             } else {
                
                 await axios.post(
-                    "http://localhost:5000/api/wishlist/add",
+                    apiUrl("/api/wishlist/add"),
                     { productId },
                     {
                         headers: {
@@ -487,7 +493,7 @@ function ShoppingHome() {
                                     </div>
                                 ))
                             ) : (
-                                <p>No products found for "{query}"</p>
+                                <p>No products found for &quot;{query}&quot;</p>
                             )
                         )}
                     </div>

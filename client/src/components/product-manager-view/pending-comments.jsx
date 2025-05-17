@@ -1,4 +1,6 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState } from "react";
+import { apiUrl } from "../../config/api";
 import axios from "axios";
 
 const PendingComments = () => {
@@ -18,7 +20,7 @@ const PendingComments = () => {
       }
   
       try {
-        const response = await axios.get("http://localhost:5000/api/products/pendingcomments", {
+        const response = await axios.get(apiUrl("/api/products/pendingcomments"), {
           headers: { Authorization: `Bearer ${token}` },
         });
         console.log("Response data:", response.data); // Log the response data
@@ -44,7 +46,7 @@ const PendingComments = () => {
       const approvalStatus = isApproved ? "true" : "false"; 
 
       await axios.put(
-        `http://localhost:5000/api/products/${commentId}/update-approval`,
+        apiUrl(`/api/products/${commentId}/update-approval`),
         { isApproved: approvalStatus }, // Send "true" or "false" as a string
         { headers: { Authorization: `Bearer ${token}` } }
       );

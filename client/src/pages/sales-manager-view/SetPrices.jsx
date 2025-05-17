@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { apiUrl } from "../../config/api";
 
 const SetPrices = () => {
   const [products, setProducts] = useState([]); // List of products
@@ -13,7 +14,7 @@ const SetPrices = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/products/all");
+        const response = await axios.get(apiUrl("/api/products/all"));
         const sortedProducts = response.data.products.sort((a, b) => a.price - b.price); // Sort by price (ascending)
         setProducts(sortedProducts);
       } catch (error) {
@@ -29,7 +30,7 @@ const SetPrices = () => {
     try {
       const token = localStorage.getItem("authToken");
       const response = await axios.put(
-        `http://localhost:5000/api/products/${productId}/set-price`,
+        apiUrl(`/api/products/${productId}/set-price`),
         { price },
         {
           headers: {

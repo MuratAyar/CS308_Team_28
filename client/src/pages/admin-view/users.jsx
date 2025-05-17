@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchUsers, updateUserRole } from "../../store/user-slice"; // Adjust the path based on your project structure
 import axios from "axios";
 import "./Users.css"; // Add a CSS file for styling
+import { apiUrl } from "../../config/api";
 
 const Users = () => {
     const dispatch = useDispatch();
@@ -17,7 +18,7 @@ const Users = () => {
             // Make the API call to update the role
             const token = localStorage.getItem("authToken"); // Retrieve token for authentication
             const response = await axios.put(
-                `http://localhost:5000/api/users/${userId}/role`,
+                apiUrl(`/api/users/${userId}/role`),
                 { role: newRole },
                 {
                     headers: { Authorization: `Bearer ${token}` },

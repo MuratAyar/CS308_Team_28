@@ -1,4 +1,6 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from "react";
+import { apiUrl } from "../../config/api";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
@@ -23,14 +25,14 @@ const ProductDetails = ({ productId }) => {
     const fetchData = async () => {
       try {
         const productResponse = await fetch(
-          `http://localhost:5000/api/products/${productId}/details`
+          apiUrl(`/api/products/${productId}/details`)
         );
         if (!productResponse.ok) throw new Error("Product not found");
         const productData = await productResponse.json();
         setProduct(productData.product);
 
         const commentsResponse = await fetch(
-          `http://localhost:5000/api/products/${productId}/comments`
+          apiUrl(`/api/products/${productId}/comments`)
         );
         if (!commentsResponse.ok) throw new Error("Failed to load comments");
         const commentsData = await commentsResponse.json();
@@ -63,7 +65,7 @@ const ProductDetails = ({ productId }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/products/${productId}/comment`,
+        apiUrl(`/api/products/${productId}/comment`),
         {
           method: "POST",
           headers: {
@@ -101,7 +103,7 @@ const ProductDetails = ({ productId }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/products/${productId}/rating`,
+        apiUrl(`/api/products/${productId}/rating`),
         {
           method: "POST",
           headers: {

@@ -1,5 +1,6 @@
 // ProductForm.jsx
 import { useState } from 'react';
+import { apiUrl } from "../../config/api";
 import axios from 'axios';
 import PropTypes from 'prop-types';
 
@@ -20,7 +21,7 @@ const ProductForm = ({ setProducts }) => {
         price: 0, // Price is set to 0 when creating a product
       };
 
-      const response = await axios.post('http://localhost:5000/api/products/add', payload);
+      const response = await axios.post('apiUrl("/api/products/add")', payload);
 
       if (response.data.success) {
         setProducts((prevProducts) => [...prevProducts, response.data.product]);

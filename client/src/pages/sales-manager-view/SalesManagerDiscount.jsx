@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableHead, TableRow, TableCell, TableBody } from "@/components/ui/table";
 import axios from "axios";
+import { apiUrl } from "../../config/api";
 
 function SalesManagerDiscount() {
   const [products, setProducts] = useState([]);
@@ -14,7 +15,7 @@ function SalesManagerDiscount() {
     const fetchProducts = async () => {
       try {
         const token = localStorage.getItem("authToken"); // Retrieve token from localStorage
-        const response = await axios.get("http://localhost:5000/api/products/all", {
+        const response = await axios.get(apiUrl("/api/products/all"), {
           headers: {
             Authorization: `Bearer ${token}`, // Attach token to request headers
           },
@@ -40,7 +41,7 @@ function SalesManagerDiscount() {
     try {
       const token = localStorage.getItem("authToken"); // Retrieve token from localStorage
       const response = await axios.put(
-        "http://localhost:5000/api/products/discount",
+        apiUrl("/api/products/discount"),
         {
           productId,
           discountRate: rate,
@@ -74,7 +75,7 @@ function SalesManagerDiscount() {
     try {
       const token = localStorage.getItem("authToken"); // Retrieve token from localStorage
       await axios.put(
-        "http://localhost:5000/api/products/undo-discount",
+        apiUrl("/api/products/undo-discount"),
         { productId },
         {
           headers: {

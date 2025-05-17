@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { apiUrl } from "../../config/api";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Dialog } from "../ui/dialog";
@@ -43,7 +44,7 @@ function ShoppingOrders() {
   // Handle cancel or refund request
   const handleCancelOrRefund = async (orderId, orderStatus) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/shop/order/cancel-or-refund/${orderId}`, {
+      const response = await fetch(apiUrl(`/api/shop/order/cancel-or-refund/${orderId}`), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
       });

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { apiUrl } from "../../config/api";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button';  // Adjusted path based on your setup
@@ -16,7 +17,7 @@ const ConfirmDeletion = () => {
             console.log("Sending request to backend with confirmation text:", confirmationText);
             
             // Update to match the full path
-            const response = await axios.post('http://localhost:5000/api/auth/confirm-delete', { confirmation: confirmationText });
+            const response = await axios.post('apiUrl("/api/auth/confirm-delete")', { confirmation: confirmationText });
             
             console.log("Response from backend:", response);
     

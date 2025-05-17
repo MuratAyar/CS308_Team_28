@@ -14,13 +14,14 @@ const userRoutes = require('./routes/user-routes');
 const invoiceRoutes = require('./routes/invoice-routes');
 const wishlistRoutes = require("./routes/shop/wishlist-routes");
 
+// Load environment variables
 require('dotenv').config();
 
 //create a database connection
 //create a seperate file for this and import that file here
 if (process.env.NODE_ENV !== 'test') {
     mongoose
-      .connect('mongodb+srv://mertsaglam349:Mert2003@mern.pmbfe.mongodb.net/')
+      .connect(process.env.MONGODB_URI || 'mongodb+srv://mertsaglam349:Mert2003@mern.pmbfe.mongodb.net/')
       .then(() => console.log('Connected to DB'))
       .catch((err) => console.error('Cannot connect to DB:', err));
   }
@@ -33,24 +34,32 @@ mongoose
     */
 
 const app = express()
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 8080
 
 
 app.use(
     cors({
-        origin: 'http://localhost:5173',
-        methods : ['GET', 'POST', 'PUT', 'DELETE'],
+        origin: process.env.CORS_ORIGIN || true,
+        methods : ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         allowedHeaders :["Content-Type", "Authorization", "Cache-Control", "Expires", "Pragma"],
         credentials : true
     })
 )
 
+app.options('*', cors({
+    origin: process.env.CORS_ORIGIN || true,
+    methods : ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders :["Content-Type", "Authorization", "Cache-Control", "Expires", "Pragma"],
+    credentials : true
+  }));
+
+  
 app.use(cookieParser());
 app.use(express.json());
 app.use('/api/auth', authRouter);
 app.use('/api', userRoutes);
 app.use('/api/products', productRoutes); 
-app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/images', express.static(path.join(__dirname, process.env.IMAGE_DIR || 'images')));
 
 app.use("/api/shop/address", shopAddressRouter)
 app.use('/api/shop/products', productRoutes);
@@ -58,7 +67,7 @@ app.use('/api/shop/cart', shopCartRouter);
 app.use("/api/shop/order", shopOrderRouter);
 app.use('/api/products', productRoutes);
 app.use('/api', invoiceRoutes);
-app.use('/invoices', express.static(path.join(__dirname, 'invoices')));
+app.use('/invoices', express.static(path.join(__dirname, process.env.INVOICE_DIR || 'invoices')));
 app.use("/api/wishlist", wishlistRoutes);
 
 module.exports = app;

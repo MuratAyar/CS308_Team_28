@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
+import { apiUrl } from '../../config/api';
 import {
   BarChart,
   Bar,
@@ -46,14 +47,10 @@ const CalculateRevenueLoss = () => {
     setError(null);
 
     try {
-      // **Temporary Fix:** Hardcode the API base URL
-      const API_BASE_URL = 'http://localhost:5000/api'; // Replace with your actual API base URL
-
-      console.log('Using API_BASE_URL:', API_BASE_URL);
       console.log('Authorization Token:', token);
 
       const response = await axios.get(
-        `${API_BASE_URL}/shop/order/revenueAndLoss`,
+        apiUrl('/shop/order/revenueAndLoss'),
         {
           params: {
             startDate,

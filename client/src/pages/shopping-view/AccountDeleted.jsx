@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { apiUrl } from "../../config/api";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "../../components/ui/card";
 import { Textarea } from "../../components/ui/textarea";
 import { Button } from "../../components/ui/button";
@@ -20,7 +21,7 @@ function AccountDeleted() {
     }
   
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/send-feedback', { feedbackText: feedback }); // Add server URL
+      const response = await axios.post('apiUrl("/api/auth/send-feedback")', { feedbackText: feedback }); // Add server URL
       if (response.data.success) {
         toast({ title: "Thank you!", description: response.data.message });
         setIsSubmitted(true); // Disable the button after success

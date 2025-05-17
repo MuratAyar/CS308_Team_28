@@ -1,4 +1,6 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState } from 'react';
+import { apiUrl } from "../../config/api";
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Button } from '@/components/ui/button'; // Update the path as needed
@@ -15,7 +17,7 @@ function OrderSuccess() {
     const fetchOrder = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/shop/order/details/${orderId}`,
+          apiUrl(`/api/shop/order/details/${orderId}`),
           {
             withCredentials: true, // Include this if your backend requires authentication
           }

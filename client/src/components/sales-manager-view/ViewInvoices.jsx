@@ -3,6 +3,7 @@ import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { Card, CardHeader, CardContent } from '../ui/card'; // Use CardContent instead of CardBody
 import { Label } from '../ui/label';
+import { apiUrl, API_BASE_URL } from '../../config/api';
 
 function ViewInvoices() {
     const [startDate, setStartDate] = useState('');
@@ -12,7 +13,7 @@ function ViewInvoices() {
     const fetchInvoices = async () => {
         try {
             const response = await fetch(
-                `http://localhost:5000/api/invoices?startDate=${startDate}&endDate=${endDate}` // Replace with your backend URL
+                apiUrl(`/invoices?startDate=${startDate}&endDate=${endDate}`) // Replace with your backend URL
             );
             if (!response.ok) throw new Error('Failed to fetch invoices');
             const data = await response.json();
@@ -24,7 +25,7 @@ function ViewInvoices() {
 
     const downloadInvoice = async (invoiceName) => {
         try {
-            const response = await fetch(`http://localhost:5000/invoices/${invoiceName}`, {
+            const response = await fetch(`${API_BASE_URL}/invoices/${invoiceName}`, {
                 method: 'GET',
             });
     
@@ -52,7 +53,7 @@ function ViewInvoices() {
     
     const openInvoiceInNewTab = (invoiceName) => {
         const link = document.createElement('a');
-        link.href = `http://localhost:5000/invoices/${invoiceName}`;
+        link.href = `${API_BASE_URL}/invoices/${invoiceName}`;
         link.target = '_blank'; // Opens in a new tab
         document.body.appendChild(link);
         link.click();

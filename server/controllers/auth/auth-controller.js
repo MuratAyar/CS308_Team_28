@@ -9,53 +9,58 @@ const { sendPasswordResetEmail } = require('../../services/passwordResetService'
 const { sendFeedbackEmail } = require('../../services/mailService');
 
 //register
-const registerUser = async(req, res) => {
-    const {userName, email, password} = req.body
-
-    try{
-
-        const checkUser = await User.findOne({email});
-        if(checkUser) return res.json({success : false,
-             message:"This email is already taken! Please try again."})
-
-        const hashPassword = await bcrypt.hash(password, 12);
-        const newUser = new User({
-            userName, email, password: hashPassword}
-        ) 
-
-        await newUser.save()
-      /*  res.status(200).json({
-            success : true,
-            message : 'Registration Successful!'
-        }) */
-
-        console.log("Email User:", process.env.EMAIL_USER);
-        console.log("Email Pass:", process.env.EMAIL_PASS ? "Loaded" : "Not Loaded");
-
-        try {
-            await sendWelcomeEmail(email, userName);
-            // Email sent successfully
-            return res.status(201).json({
-              success: true,
-              message: "User registered and email sent!"
-            });
-          } catch (emailError) {
-            console.error("Error sending email:", emailError);
-            // If email fails, return a successful registration message without failing
-            return res.status(201).json({
-              success: true,
-              message: "User registered, but email failed to send."
-            });
-          }
-
-    }catch(e){
-        console.log(e);
-        res.status(500).json({
-            success : false,
-            message : 'Some error occured!'
-        })
+const registerUser = async (req, res) => {
+    try {
+      const { userName = req.body.username, email, password } = req.body;
+  
+      console.log("⏳ Register request received with:", { userName, email });
+  
+      if (!userName || !email || !password) {
+        console.warn("⚠️ Missing fields:", { userName, email, password });
+        return res.status(400).json({
+          success: false,
+          message: "Please provide userName, email, and password.",
+        });
+      }
+  
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        console.warn("⚠️ Email already registered:", email);
+        return res.status(409).json({
+          success: false,
+          message: "This email is already taken! Please try again.",
+        });
+      }
+  
+      const hashedPassword = await bcrypt.hash(password, 12);
+      const newUser = new User({ userName, email, password: hashedPassword });
+  
+      await newUser.save();
+      console.log("✅ User saved to DB:", email);
+  
+      try {
+        await sendWelcomeEmail(email, userName);
+        console.log("✅ Welcome email sent to:", email);
+        return res.status(201).json({
+          success: true,
+          message: "User registered and email sent!",
+        });
+      } catch (emailError) {
+        console.error("❌ Email sending failed:", emailError.message);
+        return res.status(201).json({
+          success: true,
+          message: "User registered, but email failed to send.",
+        });
+      }
+    } catch (err) {
+      console.error("❌ Registration error:", err.message, err.stack);
+      res.status(500).json({
+        success: false,
+        message: "Some error occurred during registration!",
+      });
     }
-}
+  };
+  
 
 
 //login

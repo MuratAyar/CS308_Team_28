@@ -1,0 +1,25 @@
+# Server Configuration
+PORT=8080
+NODE_ENV=development
+
+# MongoDB Connection
+MONGODB_URI=mongodb+srv://mertsaglam349:Mert2003@mern.pmbfe.mongodb.net/
+
+# JWT Authentication
+JWT_SECRET=your_jwt_secret_key_twoeight_secure
+JWT_EXPIRY=7d
+
+# Email Configuration (Gmail)
+EMAIL_USER=twoeight.mail@gmail.com
+EMAIL_PASS=your_app_password_here
+
+# CORS Configuration
+CORS_ORIGIN=http://localhost:5173
+
+# API Configuration
+API_URL=http://localhost:8080
+
+# File Storage
+UPLOAD_DIR=./uploads
+INVOICE_DIR=./invoices
+IMAGE_DIR=./images 

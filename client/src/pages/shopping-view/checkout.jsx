@@ -1,4 +1,6 @@
+// eslint-disable-next-line no-unused-vars
 import { useState, useEffect } from "react";
+import { apiUrl } from "../../config/api";
 import { useSelector } from "react-redux";
 import Address from "@/components/shopping-view/address";
 import UserCartItemsContent from "@/components/shopping-view/cart-items-content";
@@ -127,7 +129,24 @@ function ShoppingCheckout() {
     let formattedExpiryDate = null;
     if (selectedPaymentMethod === "Card") {
       const [month, year] = cardDetails.expiryDate.split("/");
-      formattedExpiryDate = `20${year}-${month}-01`; // Using the first day of the month
+      // Create a date in the future with the given month and year
+      const expiryDate = new Date();
+      expiryDate.setFullYear(2000 + parseInt(year), parseInt(month) - 1, 1);
+      // Add one month to ensure it's valid (e.g., if this month is selected, it would be valid until end of month)
+      expiryDate.setMonth(expiryDate.getMonth() + 1);
+      formattedExpiryDate = expiryDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+    }
+
+    // Validate address is selected
+    if (!currentSelectedAddress) {
+      setError("Please select a shipping address.");
+      return;
+    }
+
+    // Check if cart is empty
+    if (!cartItems.items || cartItems.items.length === 0) {
+      setError("Your cart is empty. Please add items before checking out.");
+      return;
     }
 
     const orderData = {
@@ -139,7 +158,7 @@ function ShoppingCheckout() {
         city: currentSelectedAddress?.city,
         pincode: currentSelectedAddress?.pincode,
         phone: currentSelectedAddress?.phone,
-        notes: currentSelectedAddress?.notes,
+        notes: currentSelectedAddress?.notes || "",
       },
       cardNumber: selectedPaymentMethod === "Card" ? cardDetails.cardNumber : "null",
       expiryDate: selectedPaymentMethod === "Card" ? formattedExpiryDate : "null",
@@ -148,9 +167,12 @@ function ShoppingCheckout() {
     };
 
     try {
+      // Log the order data being sent
+      console.log("Sending order data:", orderData);
+      
       // Send order request to the correct endpoint
       const response = await axios.post(
-        "http://localhost:5000/api/shop/order/create",
+        apiUrl("/api/shop/order/create"),
         orderData
       );
 
@@ -159,11 +181,18 @@ function ShoppingCheckout() {
         // Redirect or show success message
         navigate(`/shop/order-success/${response.data.orderId}`);
       } else {
+        console.error("Order creation failed with response:", response.data);
         setError(response.data.message);
       }
     } catch (error) {
       console.error("Error creating order:", error);
-      setError("Error creating order.");
+      // Show more detailed error message from the response if available
+      if (error.response) {
+        console.error("Server response:", error.response.data);
+        setError(error.response.data.message || "Error creating order.");
+      } else {
+        setError("Error creating order. Please try again.");
+      }
     }
   };
 

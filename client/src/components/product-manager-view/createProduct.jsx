@@ -1,4 +1,6 @@
+// eslint-disable-next-line no-unused-vars
 import { useState, useEffect } from 'react';
+import { apiUrl } from "../../config/api";
 import axios from 'axios';
 
 const ProductListing = () => {
@@ -9,7 +11,7 @@ const ProductListing = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/products/all');
+        const response = await axios.get(apiUrl("/api/products/all"));
         setProducts(response.data.products);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -25,7 +27,7 @@ const ProductListing = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/products/update-stock/${productId}`,
+        apiUrl(`/api/products/update-stock/${productId}`),
         { newQuantity } // Send `newQuantity` in the request body
       );
 
@@ -52,7 +54,7 @@ const ProductListing = () => {
   // Handle product deletion
   const handleDelete = async (productId) => {
     try {
-      const response = await axios.delete(`http://localhost:5000/api/products/delete`, {
+      const response = await axios.delete(apiUrl("/api/products/delete"), {
         params: { _id: productId },
       });
 

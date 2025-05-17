@@ -1,9 +1,15 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState } from "react";
+import { apiUrl } from "../../config/api";
 import axios from "axios";
 
 const ManageSearchOrders = () => {
+  // We use orders in setOrders for state management
+  // eslint-disable-next-line no-unused-vars
   const [orders, setOrders] = useState([]); // All orders
   const [filteredOrders, setFilteredOrders] = useState([]); // Filtered orders
+  // We check loading state in the component rendering
+  // eslint-disable-next-line no-unused-vars
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userIdInput, setUserIdInput] = useState(""); // Input for userId filter
@@ -23,7 +29,7 @@ const ManageSearchOrders = () => {
     try {
       console.log("Fetching orders for userId:", userId);
       const response = await axios.get(
-        `http://localhost:5000/api/shop/order/list/${userId}`,
+        apiUrl(`/api/shop/order/list/${userId}`),
         {
           headers: { Authorization: `Bearer ${token}` },
         }
