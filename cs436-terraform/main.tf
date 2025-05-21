@@ -4,7 +4,7 @@ provider "google" {
 }
 
 resource "google_container_cluster" "primary" {
-  name     = "cs436-gke-cluster-tf" // İsim çakışmasını önlemek için "-tf" eklediğinizi varsayıyorum
+  name     = "cs436-gke-cluster-tf" 
   location = var.zone
 
   deletion_protection      = false
@@ -18,7 +18,7 @@ resource "google_container_cluster" "primary" {
 resource "google_container_node_pool" "primary_nodes" {
   name     = "primary-node-pool"
   location = var.zone
-  cluster  = google_container_cluster.primary.name // Veya .id kullanmak daha sağlam olabilir
+  cluster  = google_container_cluster.primary.name
 
   autoscaling {
     min_node_count = 1

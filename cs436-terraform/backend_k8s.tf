@@ -2,7 +2,7 @@ resource "kubernetes_deployment" "backend" {
   depends_on = [
     google_container_node_pool.primary_nodes,
     google_compute_instance.mongodb_vm,
-    google_compute_firewall.allow_mongodb_from_gke_nodes // Bu kural firewall.tf dosyasında tanımlı olmalı
+    google_compute_firewall.allow_mongodb_from_gke_nodes 
   ]
 
   metadata {
@@ -47,11 +47,10 @@ resource "kubernetes_deployment" "backend" {
             value = "27017"
           }
           env {
-            name  = "MONGO_DB_NAME" // Kullanacağınız veritabanı adı
-            value = "cs436_db"      // Örnek bir veritabanı adı, kendi adınızı kullanın
+            name  = "MONGO_DB_NAME" 
+            value = "cs436_db"      
           }
-          // Eğer MongoDB için kullanıcı adı/şifre kullanıyorsanız,
-          // bunları Kubernetes Secret olarak yönetip buradan referans vermeniz daha güvenlidir.
+          
 
           resources {
             requests = {

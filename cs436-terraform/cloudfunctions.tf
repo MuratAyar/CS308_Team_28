@@ -46,11 +46,11 @@ resource "google_cloudfunctions2_function" "passive_logger_function" {
   }
 
   service_config {
-    max_instance_count = 3       // İsteğe bağlı: Maksimum örnek sayısı
-    min_instance_count = 0       // İsteğe bağlı: Minimum örnek (0 talep yoksa maliyeti düşürür)
-    available_memory   = "256Mi" // İsteğe bağlı: Bellek miktarı
-    timeout_seconds    = 60      // İsteğe bağlı: Zaman aşımı
-    // ingress_settings = "ALLOW_ALL" // Bu, fonksiyonun her yerden erişilebilir olmasını sağlar (IAM ile birleşince)
+    max_instance_count = 3      
+    min_instance_count = 0      
+    available_memory   = "256Mi" 
+    timeout_seconds    = 60      
+    // ingress_settings = "ALLOW_ALL" 
     all_traffic_on_latest_revision = true
 
   }

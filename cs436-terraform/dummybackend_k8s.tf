@@ -9,7 +9,7 @@ resource "kubernetes_deployment" "dummy_backend" {
   }
 
   spec {
-    replicas = 1 // HPA bu değeri yönetecek
+    replicas = 1 
 
     selector {
       match_labels = {
