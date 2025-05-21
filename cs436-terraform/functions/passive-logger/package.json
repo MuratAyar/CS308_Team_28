@@ -1,0 +1,12 @@
+{
+    "name": "passive-logger-function",
+    "version": "1.0.0",
+    "description": "Passive logger Cloud Function",
+    "main": "index.js",
+    "dependencies": {
+      "@google-cloud/functions-framework": "^3.0.0" 
+    },
+    "engines": {
+      "node": ">=20" 
+    }
+  }
