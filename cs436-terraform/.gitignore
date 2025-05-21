@@ -1,4 +1,7 @@
+# Terraform working files - DO NOT TRACK
 **/.terraform/
 *.tfstate
 *.tfstate.backup
 *.tfvars
+crash.log
+*.log
